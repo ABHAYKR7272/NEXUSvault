@@ -210,7 +210,13 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('file'), async (req, res) => {
   try {
     const { title, description, category, message, tags, visibility } = req.body;
-    if (!title) return res.status(400).json({ success: false, message: 'Title is required' });
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
 
     let versionData = {
       versionNumber: '1.0',
@@ -222,6 +228,7 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     if (req.file) {
       const ext = path.extname(req.file.originalname).toLowerCase();
+
       if (ext === '.zip') {
         versionData.isProject   = true;
         versionData.projectTree = await buildTreeFromZipUrl(req.file.path);
@@ -240,8 +247,11 @@ router.post('/', upload.single('file'), async (req, res) => {
     const accessCode = isPrivate ? Document.generateCode() : '';
 
     const doc = await Document.create({
-      title, description: description || '', category: category || 'Other',
-      owner: req.user._id, ownerName: req.user.name,
+      title,
+      description: description || '',
+      category: category || 'Other',
+      owner: req.user._id,
+      ownerName: req.user.name,
       visibility: visibility || 'public',
       accessCode,
       tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
@@ -253,7 +263,20 @@ router.post('/', upload.single('file'), async (req, res) => {
       accessCode: isPrivate ? accessCode : undefined,
       document: doc
     });
-  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+
+  } catch (error) {
+    console.error("UPLOAD_DOCUMENT_ERROR:", {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      stack: error.stack,
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 // ── GET /api/documents/:id ────────────────────────────────────────────────
