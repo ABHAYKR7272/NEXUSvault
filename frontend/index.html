@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUSvault — Project & Document Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#080a0e; --bg1:#0d1015; --bg2:#12161d; --bg3:#181d26;
+  --bg4:#1f2531; --bg5:#262e3d;
+  --border:#ffffff0d; --border2:#ffffff1a; --border3:#ffffff26;
+  --text:#f0f2f7; --text2:#9aa3b5; --text3:#5c6578;
+  --accent:#5b8cff; --accent2:#3d6aee; --accent-g:linear-gradient(135deg,#5b8cff,#a855f7);
+  --green:#22c55e; --red:#ef4444; --yellow:#f59e0b; --orange:#f97316;
+  --purple:#a855f7; --cyan:#22d3ee; --pink:#ec4899;
+  --r:10px; --r2:14px; --mono:'DM Mono',monospace;
+  --sans:'DM Sans',sans-serif; --display:'Syne',sans-serif;
+  --shadow:0 8px 32px #00000066; --shadow2:0 2px 12px #0000004d;
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--border3)}
+
+html,body{height:100%;background:var(--bg0);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow:hidden}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #ffffff44;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+
+/* AUTH */
+#auth-page{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:var(--bg0);overflow:auto;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%,#5b8cff22,transparent),
+    radial-gradient(ellipse 50% 40% at 90% 80%,#a855f718,transparent),
+    radial-gradient(ellipse 50% 50% at 10% 90%,#22d3ee10,transparent);
+}
+#auth-page.show{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.auth-wrap{width:100%;max-width:440px;padding:2rem;animation:fadeUp .5s ease both}
+.auth-logo{text-align:center;margin-bottom:2rem}
+.auth-logo .logo-icon{
+  width:64px;height:64px;border-radius:18px;background:var(--accent-g);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:28px;margin-bottom:1rem;box-shadow:0 0 60px #5b8cff55;color:#fff;font-family:var(--display);font-weight:800;
+}
+.auth-logo h1{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-0.5px}
+.auth-logo h1 .accent{background:var(--accent-g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.auth-logo p{color:var(--text3);font-size:13px;margin-top:6px}
+
+.auth-tabs{
+  display:flex;background:var(--bg2);border-radius:var(--r);
+  padding:4px;margin-bottom:1.5rem;border:1px solid var(--border);
+}
+.auth-tab{
+  flex:1;padding:.65rem;text-align:center;border-radius:7px;cursor:pointer;
+  font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;font-family:var(--display);
+}
+.auth-tab.active{background:var(--bg4);color:var(--text);box-shadow:var(--shadow2)}
+
+.auth-card{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--r2);padding:1.75rem}
+.auth-form-panel{display:none}
+.auth-form-panel.active{display:block;animation:fadeIn .25s ease both}
+
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);padding:.7rem 1rem;color:var(--text);
+  font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.field-help{font-size:11px;color:var(--text3);margin-top:4px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:.65rem 1.25rem;border-radius:var(--r);border:none;cursor:pointer;
+  font-family:var(--display);font-size:13px;font-weight:600;
+  transition:all .2s;text-decoration:none;letter-spacing:.2px;
+}
+.btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 4px 20px #5b8cff33}
+.btn-primary:hover{opacity:.92;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--border3);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-yellow{background:var(--yellow);color:#000}
+.btn-sm{padding:.45rem .85rem;font-size:12px}
+.btn-full{width:100%;margin-top:.5rem}
+.btn-icon{padding:.55rem .75rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.auth-link{text-align:center;margin-top:1rem;color:var(--text3);font-size:13px}
+.auth-link span{color:var(--accent);cursor:pointer;font-weight:500}
+.auth-link span:hover{text-decoration:underline}
+
+.auth-footer{text-align:center;margin-top:1.5rem;font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+
+/* MAIN APP */
+#app{display:none;height:100vh;flex-direction:column}
+#app.show{display:flex}
+
+.topbar{
+  height:58px;background:var(--bg1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 1.25rem;gap:1rem;flex-shrink:0;
+  position:relative;z-index:100;
+}
+.topbar-logo{
+  display:flex;align-items:center;gap:10px;font-family:var(--display);
+  font-weight:800;font-size:17px;letter-spacing:-.4px;cursor:pointer;
+}
+.topbar-logo .tl-icon{
+  width:34px;height:34px;border-radius:9px;background:var(--accent-g);
+  display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:800;
+}
+.topbar-logo .tl-text .accent{background:var(--accent-g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.topbar-search{flex:1;max-width:420px;position:relative}
+.topbar-search input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:.55rem 1rem .55rem 2.5rem;
+  color:var(--text);font-size:13px;outline:none;transition:border-color .2s;
+}
+.topbar-search input:focus{border-color:var(--accent)}
+.topbar-search .srch-ic{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.6rem}
+.topbar-notif{
+  position:relative;width:36px;height:36px;border-radius:9px;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:var(--text2);font-size:15px;transition:all .2s;
+}
+.topbar-notif:hover{border-color:var(--border3);color:var(--text);background:var(--bg4)}
+.notif-badge{
+  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;
+  background:var(--red);border-radius:99px;font-size:10px;
+  display:none;align-items:center;justify-content:center;color:#fff;font-weight:700;
+}
+.notif-badge.show{display:flex}
+.avatar-btn{
+  width:36px;height:36px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;cursor:pointer;
+  font-size:13px;font-weight:700;color:#fff;font-family:var(--display);
+  border:2px solid transparent;transition:all .2s;
+}
+.avatar-btn:hover{border-color:var(--border3)}
+
+.main-layout{display:flex;flex:1;overflow:hidden}
+
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--bg1);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  padding:.75rem 0;overflow-y:auto;
+}
+.sidebar-section{padding:.25rem .75rem;margin-bottom:.25rem}
+.sidebar-label{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;padding:.5rem .5rem .25rem}
+.sidebar-item{
+  display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;
+  border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;
+  font-weight:500;transition:all .15s;position:relative;
+}
+.sidebar-item:hover{background:var(--bg3);color:var(--text)}
+.sidebar-item.active{background:var(--bg4);color:var(--text)}
+.sidebar-item.active::before{
+  content:'';position:absolute;left:-12px;top:20%;height:60%;
+  width:3px;background:var(--accent);border-radius:0 3px 3px 0;
+}
+.sidebar-item .si-ic{width:18px;text-align:center;font-size:14px}
+.sidebar-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:1px 7px;border-radius:99px;font-weight:700}
+.sidebar-badge.warn{background:var(--yellow);color:#000}
+
+.sidebar-foot{margin-top:auto;padding:1rem .75rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3);text-align:center;letter-spacing:.5px}
+.sidebar-foot strong{color:var(--text2);font-family:var(--display)}
+
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+.view{display:none;flex:1;overflow:auto;padding:1.5rem}
+.view.active{display:block;animation:fadeIn .25s ease both}
+
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.page-hdr h2{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:-.4px}
+.page-hdr p{color:var(--text3);font-size:13px;margin-top:2px}
+.hdr-acts{display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.85rem;margin-bottom:1.75rem}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);
+  padding:1.1rem;position:relative;overflow:hidden;transition:all .2s;
+}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-value{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.5px}
+.stat-label{font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
+.stat-icon{position:absolute;top:1.1rem;right:1.1rem;font-size:18px;opacity:.7}
+
+/* Filter chips */
+.filter-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.filter-chip{
+  padding:.4rem .85rem;border-radius:99px;background:var(--bg2);
+  border:1px solid var(--border);font-size:12px;font-weight:500;
+  cursor:pointer;color:var(--text2);transition:all .15s;font-family:var(--display);
+}
+.filter-chip:hover{border-color:var(--border3);color:var(--text)}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Project cards */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
+.doc-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);
+  padding:1.1rem;cursor:pointer;position:relative;transition:all .2s;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.doc-card:hover{border-color:var(--border3);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.dc-vis{
+  position:absolute;top:.75rem;right:.75rem;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:99px;letter-spacing:.3px;font-family:var(--display);
+}
+.dc-vis.public{background:#22c55e1f;color:var(--green)}
+.dc-vis.private{background:#a855f71f;color:var(--purple)}
+.dc-head-badge{
+  position:absolute;top:2.6rem;right:.75rem;font-size:9px;font-weight:700;
+  padding:2px 8px;border-radius:99px;letter-spacing:.5px;text-transform:uppercase;
+  background:var(--accent-g);color:#fff;
+}
+.dc-pending{
+  position:absolute;top:.75rem;right:5.5rem;background:var(--yellow);color:#000;
+  font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;
+}
+.dc-top{display:flex;align-items:center;gap:.75rem;padding-right:5rem}
+.dc-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.dc-title{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.3;letter-spacing:-.2px}
+.dc-owner{font-size:11px;color:var(--text3);margin-top:2px}
+.dc-desc{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dc-meta{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.dc-cat{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--bg4);color:var(--text2);font-family:var(--display);letter-spacing:.3px}
+.dc-tag{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--bg3);color:var(--text3);font-family:var(--mono)}
+.dc-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text3);padding-top:.4rem;border-top:1px solid var(--border);margin-top:auto;flex-wrap:wrap;gap:.4rem}
+.dc-stat{display:inline-flex;align-items:center;gap:3px}
+
+/* Modal */
+.ov{display:none;position:fixed;inset:0;background:#000000bb;z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem;backdrop-filter:blur(4px)}
+.ov.show{display:flex;animation:fadeIn .15s ease both}
+.modal{
+  width:100%;max-width:520px;background:var(--bg1);border:1px solid var(--border2);
+  border-radius:var(--r2);padding:1.75rem;position:relative;animation:fadeUp .25s ease both;
+}
+.modal-lg{max-width:720px}
+.modal-xl{max-width:1100px}
+.m-close{
+  position:absolute;top:.75rem;right:.75rem;width:32px;height:32px;border-radius:8px;
+  background:var(--bg3);border:none;color:var(--text2);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.m-close:hover{background:var(--bg4);color:var(--text)}
+.m-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.3px;padding-right:2rem}
+.m-sub{font-size:12px;color:var(--text3);margin-top:4px;margin-bottom:1.25rem}
+.m-divider{height:1px;background:var(--border);margin:1.25rem 0}
+.m-acts{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap}
+
+/* Visibility selector */
+.vis-select{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem}
+.vis-opt{
+  padding:.85rem;border-radius:var(--r);background:var(--bg3);
+  border:2px solid var(--border);cursor:pointer;transition:all .15s;position:relative;
+}
+.vis-opt:hover{border-color:var(--border3)}
+.vis-opt.selected{border-color:var(--accent);background:#5b8cff10}
+.vis-opt.private.selected{border-color:var(--purple);background:#a855f710}
+.vo-icon{font-size:20px;margin-bottom:4px}
+.vo-title{font-family:var(--display);font-weight:700;font-size:13px}
+.vo-desc{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.vis-check{position:absolute;top:.5rem;right:.5rem;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.vis-opt.selected .vis-check{display:flex}
+.vis-opt.private.selected .vis-check{background:var(--purple)}
+
+/* Upload zone */
+.upload-zone{
+  border:2px dashed var(--border2);border-radius:var(--r);padding:2rem;text-align:center;
+  cursor:pointer;transition:all .15s;position:relative;background:var(--bg3);
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:#5b8cff08}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.uz-icon{font-size:36px;display:block;margin-bottom:.5rem}
+.uz-title{font-family:var(--display);font-weight:700;font-size:14px}
+.uz-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.upload-preview{display:none;align-items:center;gap:.75rem;padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);margin-top:.75rem}
+.up-icon{font-size:24px}
+.up-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.up-size{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.up-clear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px}
+
+/* Code display */
+.code-display{display:flex;justify-content:center;gap:.4rem;margin:1rem 0}
+.code-digit{
+  width:42px;height:52px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);
+}
+.code-input{display:flex;justify-content:center;gap:.4rem;margin-top:.5rem}
+.code-input input{
+  width:42px;height:52px;text-align:center;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:var(--r);
+  font-family:var(--mono);font-size:22px;color:var(--text);outline:none;
+}
+.code-input input:focus{border-color:var(--accent)}
+
+/* Empty/loading */
+.empty-state,.loading-state{
+  text-align:center;padding:3rem 1rem;color:var(--text3);
+}
+.es-icon,.fe-icon{font-size:42px;display:block;margin-bottom:.75rem;opacity:.6}
+.empty-state h3{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text2);margin-bottom:.25rem}
+.empty-state p{font-size:13px}
+
+/* File viewer */
+.file-viewer{display:flex;height:460px;background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.fv-tree{width:240px;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg1);padding:.5rem 0}
+.fv-content{flex:1;overflow:auto;background:var(--bg0)}
+.fv-content pre{padding:1rem;font-family:var(--mono);font-size:12px;color:var(--text2);white-space:pre;line-height:1.6}
+.fv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:6px}
+.tree-row{display:flex;align-items:center;gap:.4rem;padding:.3rem .6rem;cursor:pointer;font-size:12px;color:var(--text2);border-radius:5px;margin:1px .5rem}
+.tree-row:hover{background:var(--bg3);color:var(--text)}
+.tree-row.selected{background:var(--accent);color:#fff}
+.tree-toggle{font-size:9px;color:var(--text3);transition:transform .15s;display:inline-block;width:12px}
+.tree-toggle.open{transform:rotate(90deg)}
+.tr-ic{font-size:13px;width:16px;text-align:center}
+.tr-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
+.tree-children{margin-left:0}
+
+/* Diff viewer */
+.diff-view{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg0);max-height:460px;overflow-y:auto}
+.diff-header{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);font-family:var(--mono);font-size:11px;color:var(--text3)}
+.diff-header-col{padding:.5rem .85rem;border-right:1px solid var(--border)}
+.diff-body{display:grid;grid-template-columns:1fr 1fr}
+.diff-col{font-family:var(--mono);font-size:11px;line-height:1.5;padding:.4rem 0}
+.diff-line{padding:1px .85rem;white-space:pre-wrap;word-break:break-all}
+.diff-line.add{background:#22c55e15;color:#86efac}
+.diff-line.rem{background:#ef444415;color:#fca5a5}
+.diff-line.same{color:var(--text3)}
+/* ── Tree compare ─────────────────────────────── */
+.tcmp-wrap{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg0)}
+.tcmp-head{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);font-family:var(--mono);font-size:11px;color:var(--text3)}
+.tcmp-head>div{padding:.5rem .85rem;border-right:1px solid var(--border)}
+.tcmp-body{display:grid;grid-template-columns:1fr 1fr;max-height:380px;overflow:auto}
+.tcmp-col{padding:.4rem 0;font-family:var(--mono);font-size:12px;border-right:1px solid var(--border)}
+.tnode{padding:2px 6px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;border-left:3px solid transparent}
+.tnode:hover{background:var(--bg2)}
+.tnode.sel{background:var(--bg3);border-left-color:var(--accent)}
+.tnode.added   {color:#86efac;border-left-color:#22c55e}
+.tnode.removed {color:#fca5a5;border-left-color:#ef4444;text-decoration:line-through;opacity:.85}
+.tnode.modified{color:#fcd34d;border-left-color:#f59e0b}
+.tnode.same    {color:var(--text2)}
+.tnode.missing {opacity:.25;font-style:italic}
+.tnode .twig{display:inline-block;width:10px;text-align:center;color:var(--text3)}
+.tnode .chg-dots{display:inline-flex;gap:3px;margin-left:6px;align-items:center}
+.tnode .chg-dot{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 4px currentColor}
+.tnode .chg-dot.a{background:#22c55e;color:#22c55e}
+.tnode .chg-dot.m{background:#f59e0b;color:#f59e0b}
+.tnode .chg-dot.r{background:#ef4444;color:#ef4444}
+.tnode .chg-count{font-size:10px;color:var(--text3);margin-left:4px;font-weight:600}
+.tnode.has-changes{background:linear-gradient(90deg,rgba(245,158,11,.07),transparent 60%)}
+.tcmp-stats{display:flex;gap:.85rem;font-size:12px;margin-bottom:.5rem;flex-wrap:wrap}
+.tcmp-stats .pill{padding:2px 8px;border-radius:99px;background:var(--bg3);border:1px solid var(--border)}
+
+/* Member table */
+.member-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg2);border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.member-table th{background:var(--bg4);padding:.6rem .85rem;text-align:left;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.4px;text-transform:uppercase}
+.member-table td{padding:.7rem .85rem;border-top:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.member-table tr.blocked td{opacity:.55}
+.role-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:var(--display)}
+.role-badge.head{background:linear-gradient(135deg,#5b8cff44,#a855f744);color:#cbd5ff}
+.role-badge.editor{background:#22d3ee20;color:var(--cyan)}
+.role-badge.viewer{background:#22c55e20;color:var(--green)}
+.role-badge.blocked{background:#ef444420;color:var(--red)}
+
+/* Toasts */
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+.toast{
+  background:var(--bg2);border:1px solid var(--border2);border-left:3px solid var(--accent);
+  border-radius:var(--r);padding:.75rem 1rem;font-size:13px;color:var(--text);
+  box-shadow:var(--shadow);animation:fadeUp .25s ease both;max-width:320px;
+  display:flex;align-items:center;gap:.5rem;
+}
+.toast.success{border-left-color:var(--green)}
+.toast.error{border-left-color:var(--red)}
+.toast.warn{border-left-color:var(--yellow)}
+
+/* Dropdown */
+.dropdown{position:relative}
+.dropdown-menu{
+  position:absolute;top:calc(100% + 6px);right:0;min-width:200px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);
+  padding:6px;box-shadow:var(--shadow);display:none;z-index:200;
+}
+.dropdown-menu.show{display:block;animation:fadeUp .15s ease both}
+.dd-item{
+  padding:.55rem .75rem;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);
+  display:flex;align-items:center;gap:.5rem;transition:all .12s;
+}
+.dd-item:hover{background:var(--bg4);color:var(--text)}
+.dd-item.danger{color:var(--red)}
+.dd-divider{height:1px;background:var(--border);margin:.25rem 0}
+.dd-header{padding:.5rem .75rem;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-family:var(--display);font-weight:600}
+
+/* Avatar large */
+.avatar-lg{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;font-family:var(--display)}
+.color-picker{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.color-swatch:hover{transform:scale(1.1)}
+.color-swatch.active{border-color:#fff;box-shadow:0 0 0 2px var(--bg1)}
+
+.skill-pill{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
+  background:var(--bg3);border:1px solid var(--border2);border-radius:99px;
+  font-size:11px;color:var(--text2);margin:2px;font-family:var(--mono);
+}
+.skill-pill button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;line-height:1;padding:0}
+.skill-pill button:hover{color:var(--red)}
+
+.prog-bar{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:.5rem}
+.prog-fill{height:100%;background:var(--accent-g);border-radius:3px;transition:width .3s}
+
+/* Profile view */
+.profile-hero{
+  background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);
+  border-radius:var(--r2);padding:1.75rem;margin-bottom:1.25rem;position:relative;overflow:hidden;
+}
+.profile-hero::before{
+  content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,#5b8cff15,transparent 60%);pointer-events:none;
+}
+.profile-row{display:flex;align-items:flex-start;gap:1.25rem;flex-wrap:wrap;position:relative}
+.profile-meta{display:flex;flex-wrap:wrap;gap:.4rem .9rem;font-size:12px;color:var(--text3);margin-top:.4rem}
+.profile-meta span{display:inline-flex;align-items:center;gap:4px}
+
+/* Section heading */
+.sh{font-family:var(--display);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.6rem}
+
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- ═══════════════════ AUTH PAGE ═══════════════════ -->
+<div id="auth-page">
+ <div class="auth-wrap">
+  <div class="auth-logo">
+   <div class="logo-icon">N</div>
+   <h1>NEXUS<span class="accent">vault</span></h1>
+   <p>Secure project & document collaboration</p>
+  </div>
+
+  <div class="auth-tabs">
+   <div class="auth-tab active" onclick="switchAuthTab('login')">Sign In</div>
+   <div class="auth-tab" onclick="switchAuthTab('register')">Create Account</div>
+  </div>
+
+  <div class="auth-card">
+   <!-- LOGIN -->
+   <div class="auth-form-panel active" id="panel-login">
+    <div class="field">
+     <label>Email Address</label>
+     <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="field">
+     <label>Password</label>
+     <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-full" id="btn-login" onclick="doLogin()">Sign In →</button>
+   </div>
+
+   <!-- REGISTER -->
+   <div class="auth-form-panel" id="panel-register">
+    <div class="field-row">
+     <div class="field"><label>Full Name *</label><input type="text" id="r-name" placeholder="Your name"></div>
+     <div class="field"><label>Title</label><input type="text" id="r-title" placeholder="e.g. Engineer"></div>
+    </div>
+    <div class="field"><label>Department</label><input type="text" id="r-dept" placeholder="e.g. Engineering"></div>
+    <div class="field"><label>Email Address *</label><input type="email" id="r-email" placeholder="you@example.com"></div>
+    <div class="field"><label>Password *</label><input type="password" id="r-pass" placeholder="Min. 6 characters"></div>
+    <button class="btn btn-primary btn-full" id="btn-register" onclick="doRegister()">Create Account →</button>
+   </div>
+  </div>
+
+  <div class="auth-link" id="auth-bottom">
+   New here? <span onclick="switchAuthTab('register')">Create an account</span>
+  </div>
+  <div class="auth-footer">NEXUSvault © 2024 · Built for collaborative teams</div>
+ </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div id="app">
+
+ <div class="topbar">
+  <div class="topbar-logo" onclick="showView('home')">
+   <div class="tl-icon">N</div>
+   <span class="tl-text">NEXUS<span class="accent">vault</span></span>
+  </div>
+  <div class="topbar-search">
+   <span class="srch-ic">🔍</span>
+   <input type="text" placeholder="Search projects, tags, descriptions..." id="search-inp" oninput="handleSearch(this.value)">
+  </div>
+  <div class="topbar-right">
+   <div class="topbar-notif" onclick="openOv('ov-requests')" title="Access Requests" id="notif-btn">
+    <span>🔔</span><span class="notif-badge" id="notif-badge">0</span>
+   </div>
+   <div class="dropdown" id="user-dropdown">
+    <div class="avatar-btn" id="avatar-btn" onclick="toggleDropdown()">U</div>
+    <div class="dropdown-menu" id="dd-menu">
+     <div class="dd-header" id="dd-name">Signed in</div>
+     <div class="dd-item" onclick="showView('profile')">👤 My Profile</div>
+     <div class="dd-item" onclick="openOv('ov-edit-profile')">✏️ Edit Profile</div>
+     <div class="dd-item" onclick="openOv('ov-change-pass')">🔑 Change Password</div>
+     <div class="dd-divider"></div>
+     <div class="dd-item danger" onclick="doLogout()">🚪 Sign Out</div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="main-layout">
+  <div class="sidebar">
+   <div class="sidebar-section">
+    <div class="sidebar-label">Workspace</div>
+    <div class="sidebar-item active" id="nav-home" onclick="showView('home')"><span class="si-ic">🏠</span> Dashboard</div>
+    <div class="sidebar-item" id="nav-projects" onclick="showView('projects')"><span class="si-ic">📁</span> All Projects</div>
+    <div class="sidebar-item" id="nav-my" onclick="showView('my')"><span class="si-ic">⭐</span> My Projects</div>
+    <div class="sidebar-item" id="nav-starred" onclick="showView('starred')"><span class="si-ic">✨</span> Starred</div>
+    <div class="sidebar-item" id="nav-private" onclick="showView('private')"><span class="si-ic">🔒</span> Private</div>
+   </div>
+   <div class="sidebar-section">
+    <div class="sidebar-label">Community</div>
+    <div class="sidebar-item" id="nav-people" onclick="showView('people')"><span class="si-ic">👥</span> People</div>
+   </div>
+   <div class="sidebar-section">
+    <div class="sidebar-label">Quick Actions</div>
+    <div class="sidebar-item" onclick="openUpload()"><span class="si-ic">➕</span> New Project</div>
+    <div class="sidebar-item" onclick="openOv('ov-join')"><span class="si-ic">🔑</span> Join with Code</div>
+   </div>
+   <div class="sidebar-foot">
+    <strong>NEXUSvault</strong><br>v1.0 · 2024
+   </div>
+  </div>
+
+  <div class="content">
+
+   <!-- DASHBOARD -->
+   <div class="view active" id="view-home">
+    <div class="page-hdr">
+     <div><h2 id="home-greeting">Welcome back 👋</h2><p>Your workspace at a glance</p></div>
+     <div class="hdr-acts">
+      <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')">🔑 Join Project</button>
+      <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New Project</button>
+     </div>
+    </div>
+    <div class="stats-row" id="home-stats"></div>
+    <div class="page-hdr" style="margin-bottom:.75rem">
+      <div><h2 style="font-size:18px">Recent Projects</h2></div>
+      <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="showView('projects')">View all →</span>
+    </div>
+    <div class="doc-grid" id="home-recent"></div>
+   </div>
+
+   <!-- ALL PROJECTS -->
+   <div class="view" id="view-projects">
+    <div class="page-hdr">
+     <div><h2>All Projects</h2><p>Browse all accessible projects</p></div>
+     <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ Upload</button>
+    </div>
+    <div class="filter-bar">
+     <span class="filter-chip active" onclick="setFilter('all',this)">All</span>
+     <span class="filter-chip" onclick="setFilter('Report',this)">Reports</span>
+     <span class="filter-chip" onclick="setFilter('Technical',this)">Technical</span>
+     <span class="filter-chip" onclick="setFilter('Design',this)">Design</span>
+     <span class="filter-chip" onclick="setFilter('Proposal',this)">Proposals</span>
+     <span class="filter-chip" onclick="setFilter('HR',this)">HR</span>
+     <span class="filter-chip" onclick="setFilter('Legal',this)">Legal</span>
+     <span class="filter-chip" onclick="setFilter('Other',this)">Other</span>
+    </div>
+    <div class="doc-grid" id="projects-grid"></div>
+   </div>
+
+   <!-- MY PROJECTS -->
+   <div class="view" id="view-my">
+    <div class="page-hdr">
+     <div><h2>My Projects</h2><p>Projects where you are head or a collaborator</p></div>
+     <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New Project</button>
+    </div>
+    <div class="doc-grid" id="my-grid"></div>
+   </div>
+
+   <!-- STARRED -->
+   <div class="view" id="view-starred">
+    <div class="page-hdr"><div><h2>✨ Starred</h2><p>Projects you've starred</p></div></div>
+    <div class="doc-grid" id="starred-grid"></div>
+   </div>
+
+   <!-- PRIVATE -->
+   <div class="view" id="view-private">
+    <div class="page-hdr"><div><h2>🔒 Private Projects</h2><p>Projects with restricted access</p></div></div>
+    <div class="doc-grid" id="private-grid"></div>
+   </div>
+
+   <!-- PEOPLE -->
+   <div class="view" id="view-people">
+    <div class="page-hdr"><div><h2>👥 People</h2><p>Members of the workspace</p></div></div>
+    <div class="doc-grid" id="people-grid"></div>
+   </div>
+
+   <!-- PROFILE -->
+   <div class="view" id="view-profile">
+    <div id="profile-content"></div>
+   </div>
+
+  </div>
+ </div>
+</div>
+
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- UPLOAD -->
+<div class="ov" id="ov-upload">
+ <div class="modal modal-lg">
+  <button class="m-close" onclick="closeOv('ov-upload')">✕</button>
+  <div class="m-title">New Project</div>
+  <div class="m-sub">Upload a single file, a zip folder, or any other artifact</div>
+
+  <div class="field"><label>Project Title *</label><input type="text" id="up-title" placeholder="My Awesome Project"></div>
+  <div class="field"><label>Description</label><input type="text" id="up-desc" placeholder="Brief description..."></div>
+  <div class="field-row">
+   <div class="field">
+    <label>Category</label>
+    <select id="up-cat">
+     <option>Other</option><option>Report</option><option>Proposal</option>
+     <option>Technical</option><option>Design</option><option>Legal</option><option>HR</option>
+    </select>
+   </div>
+   <div class="field"><label>Tags (comma separated)</label><input type="text" id="up-tags" placeholder="react, nodejs, web"></div>
+  </div>
+  <div class="field"><label>Version Note</label><input type="text" id="up-msg" placeholder="Initial release..."></div>
+
+  <div class="field"><label>Visibility</label>
+   <div class="vis-select">
+    <div class="vis-opt selected" id="vis-pub" onclick="setVis('public')">
+     <div class="vo-icon">🌍</div>
+     <div class="vo-title">Public</div>
+     <div class="vo-desc">Anyone in the workspace can view</div>
+     <span class="vis-check">✓</span>
+    </div>
+    <div class="vis-opt private" id="vis-priv" onclick="setVis('private')">
+     <div class="vo-icon">🔒</div>
+     <div class="vo-title">Private</div>
+     <div class="vo-desc">You become Head — approve members & manage roles</div>
+     <span class="vis-check">✓</span>
+    </div>
+   </div>
+  </div>
+
+  <div style="margin-top:1rem">
+   <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+    <span class="uz-icon">📦</span>
+    <div class="uz-title">Drop file or folder here</div>
+    <div class="uz-sub">Any file type — single file, zip archive, image, PDF, code, or anything else</div>
+    <input type="file" id="up-file" onchange="handleFileSelect(this)">
+   </div>
+   <div class="upload-preview" id="upload-preview">
+    <span class="up-icon" id="up-file-icon">📄</span>
+    <div style="flex:1;min-width:0">
+     <div class="up-name" id="up-file-name"></div>
+     <div class="up-size" id="up-file-size"></div>
+    </div>
+    <button class="up-clear" onclick="clearFile()">✕</button>
+   </div>
+  </div>
+
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-upload')">Cancel</button>
+   <button class="btn btn-primary" id="btn-upload" onclick="doUpload()">🚀 Create Project</button>
+  </div>
+ </div>
+</div>
+
+<!-- ACCESS CODE DISPLAY -->
+<div class="ov" id="ov-code-show">
+ <div class="modal">
+  <button class="m-close" onclick="closeOv('ov-code-show')">✕</button>
+  <div class="m-title">🔐 Private Project Created</div>
+  <div class="m-sub">You are now the <strong>Head</strong> of this project. Share the code below — members will request access and you decide their role.</div>
+  <div class="code-display" id="code-show-digits"></div>
+  <p style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:1rem">Members must enter this code and await your approval before accessing the project.</p>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="copyCode()">📋 Copy Code</button>
+   <button class="btn btn-primary" onclick="closeOv('ov-code-show')">Done</button>
+  </div>
+ </div>
+</div>
+
+<!-- JOIN -->
+<div class="ov" id="ov-join">
+ <div class="modal">
+  <button class="m-close" onclick="closeOv('ov-join')">✕</button>
+  <div class="m-title">🔑 Join Private Project</div>
+  <div class="m-sub">Enter the 6-digit code shared by the project head</div>
+  <div class="field"><label>Project Title</label><input type="text" id="join-project-search" placeholder="Search project name..." oninput="searchForJoin(this.value)"></div>
+  <div id="join-search-results" style="margin-bottom:.75rem"></div>
+  <div class="field"><label>6-Digit Access Code</label>
+   <div class="code-input" id="code-input-boxes">
+    <input maxlength="1" oninput="codeDigitInput(this,0)" onkeydown="codeDigitKey(event,0)">
+    <input maxlength="1" oninput="codeDigitInput(this,1)" onkeydown="codeDigitKey(event,1)">
+    <input maxlength="1" oninput="codeDigitInput(this,2)" onkeydown="codeDigitKey(event,2)">
+    <input maxlength="1" oninput="codeDigitInput(this,3)" onkeydown="codeDigitKey(event,3)">
+    <input maxlength="1" oninput="codeDigitInput(this,4)" onkeydown="codeDigitKey(event,4)">
+    <input maxlength="1" oninput="codeDigitInput(this,5)" onkeydown="codeDigitKey(event,5)">
+   </div>
+  </div>
+  <div class="field"><label>Message to Head (optional)</label><input type="text" id="join-msg" placeholder="Why you'd like access..." maxlength="200"></div>
+  <div id="join-status" style="display:none;padding:.75rem;border-radius:var(--r);font-size:13px;margin-bottom:.75rem"></div>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-join')">Cancel</button>
+   <button class="btn btn-primary" onclick="doJoin()">Request Access</button>
+  </div>
+ </div>
+</div>
+
+<!-- DETAIL -->
+<div class="ov" id="ov-detail">
+ <div class="modal modal-xl">
+  <button class="m-close" onclick="closeOv('ov-detail')">✕</button>
+  <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;padding-right:2rem;margin-bottom:1rem">
+   <div style="flex:1;min-width:200px">
+    <div class="m-title" id="det-title"></div>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-top:.4rem;flex-wrap:wrap">
+     <span id="det-vis-badge"></span>
+     <span id="det-head-badge"></span>
+     <span style="font-size:12px;color:var(--text3)" id="det-owner"></span>
+     <span style="font-size:12px;color:var(--text3)" id="det-date"></span>
+     <span style="font-size:12px;color:var(--text3)" id="det-stars"></span>
+    </div>
+   </div>
+   <div style="display:flex;gap:.4rem;flex-wrap:wrap" id="det-actions"></div>
+  </div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:1rem" id="det-desc"></p>
+
+  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap">
+   <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0" onchange="loadVersion(this.value)"></select>
+   <button class="btn btn-ghost btn-sm" id="btn-diff" onclick="openDiff()">↔ Compare</button>
+   <button class="btn btn-ghost btn-sm" id="btn-new-ver" onclick="openNewVersion()">🔄 New Version</button>
+   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" target="_blank">⬇ Download</a>
+   <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Delete Version</button>
+  </div>
+
+  <div id="det-viewer"></div>
+
+  <div class="m-divider"></div>
+  <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+   <div style="flex:1;min-width:220px">
+    <div class="sh">Version Details</div>
+    <div id="det-ver-info" style="font-size:13px;color:var(--text2)"></div>
+   </div>
+   <div style="flex:1;min-width:220px" id="det-members-box"></div>
+  </div>
+
+  <div class="m-divider"></div>
+  <div class="sh">Comments</div>
+  <div id="det-comments" style="max-height:220px;overflow-y:auto;margin-bottom:.75rem"></div>
+  <div style="display:flex;gap:.5rem">
+   <input type="text" id="comment-inp" placeholder="Add a comment..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:.55rem .9rem;color:var(--text);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')postComment()">
+   <button class="btn btn-primary btn-sm" onclick="postComment()">Post</button>
+  </div>
+ </div>
+</div>
+
+<!-- NEW VERSION -->
+<div class="ov" id="ov-new-version">
+ <div class="modal modal-lg">
+  <button class="m-close" onclick="closeOv('ov-new-version')">✕</button>
+  <div class="m-title">Upload New Version</div>
+  <div class="m-sub" id="nv-sub"></div>
+  <div class="field"><label>Version Note *</label><input type="text" id="nv-msg" placeholder="What changed in this version?"></div>
+  <div class="field">
+   <label>Version Bump</label>
+   <select id="nv-bump">
+    <option value="minor">Minor (1.0 → 1.1)</option>
+    <option value="major">Major (1.0 → 2.0)</option>
+   </select>
+  </div>
+  <div class="upload-zone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDropNV(event)">
+   <span class="uz-icon">📁</span>
+   <div class="uz-title">Drop new file or folder here</div>
+   <div class="uz-sub">Any file type — updated source, new build, revised doc</div>
+   <input type="file" id="nv-file" onchange="handleNVFile(this)">
+  </div>
+  <div class="upload-preview" id="nv-preview">
+   <span class="up-icon" id="nv-file-icon">📄</span>
+   <div style="flex:1;min-width:0">
+    <div class="up-name" id="nv-file-name"></div>
+    <div class="up-size" id="nv-file-size"></div>
+   </div>
+   <button class="up-clear" onclick="clearNVFile()">✕</button>
+  </div>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-new-version')">Cancel</button>
+   <button class="btn btn-primary" onclick="doNewVersion()">🚀 Upload Version</button>
+  </div>
+ </div>
+</div>
+
+<!-- DIFF -->
+<div class="ov" id="ov-diff">
+ <div class="modal modal-xl">
+  <button class="m-close" onclick="closeOv('ov-diff')">✕</button>
+  <div class="m-title">↔ Compare Versions</div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:.75rem;align-items:end;margin-top:.5rem;margin-bottom:1rem">
+   <div class="field" style="margin:0"><label>Version A</label><select id="diff-v1"></select></div>
+   <div style="padding-bottom:.6rem;color:var(--text3)">vs</div>
+   <div class="field" style="margin:0"><label>Version B</label><select id="diff-v2"></select></div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="runDiff()" style="margin-bottom:1rem">Run Comparison</button>
+  <div id="diff-result"></div>
+ </div>
+</div>
+
+<!-- ACCESS REQUESTS -->
+<div class="ov" id="ov-requests">
+ <div class="modal modal-lg">
+  <button class="m-close" onclick="closeOv('ov-requests')">✕</button>
+  <div class="m-title">🔔 Access Requests</div>
+  <div class="m-sub">Manage who can access your private projects</div>
+  <div id="requests-list"></div>
+ </div>
+</div>
+
+<!-- MEMBERS -->
+<div class="ov" id="ov-members">
+ <div class="modal modal-lg">
+  <button class="m-close" onclick="closeOv('ov-members')">✕</button>
+  <div class="m-title">👥 Project Members</div>
+  <div class="m-sub">As Head, you can promote, block, or remove members</div>
+
+  <div style="margin-bottom:1rem">
+   <div class="sh">Access Stats</div>
+   <div id="members-stats" style="font-size:13px;color:var(--text2)"></div>
+  </div>
+
+  <div class="sh">Members</div>
+  <table class="member-table" id="members-table">
+   <thead><tr><th>User</th><th>Role</th><th>Since</th><th>Actions</th></tr></thead>
+   <tbody id="members-tbody"></tbody>
+  </table>
+
+  <div class="m-divider"></div>
+  <div class="sh">Access Code</div>
+  <div id="members-code-section"></div>
+ </div>
+</div>
+
+<!-- EDIT PROFILE -->
+<div class="ov" id="ov-edit-profile">
+ <div class="modal modal-lg">
+  <button class="m-close" onclick="closeOv('ov-edit-profile')">✕</button>
+  <div class="m-title">✏️ Edit Profile</div>
+  <div class="m-sub">Update your information and customize your avatar</div>
+
+  <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+   <div class="avatar-lg" id="prof-avatar-prev">U</div>
+   <div>
+    <div class="sh" style="margin-bottom:.4rem">Avatar Color</div>
+    <div class="color-picker" id="prof-color-picker"></div>
+   </div>
+  </div>
+
+  <div class="field-row">
+   <div class="field"><label>Full Name</label><input type="text" id="prof-name"></div>
+   <div class="field"><label>Title</label><input type="text" id="prof-title" placeholder="e.g. Senior Engineer"></div>
+  </div>
+  <div class="field-row">
+   <div class="field"><label>Department</label><input type="text" id="prof-dept"></div>
+   <div class="field"><label>Location</label><input type="text" id="prof-location" placeholder="City, Country"></div>
+  </div>
+  <div class="field-row">
+   <div class="field"><label>Phone</label><input type="text" id="prof-phone"></div>
+   <div class="field"><label>Website</label><input type="text" id="prof-website" placeholder="https://..."></div>
+  </div>
+  <div class="field"><label>Bio</label><textarea id="prof-bio" rows="3" placeholder="A short bio (max 280 characters)"></textarea></div>
+  <div class="field">
+   <label>Skills</label>
+   <input type="text" id="prof-skill-inp" placeholder="Type a skill and press Enter" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill(this.value);this.value=''}">
+   <div id="prof-skills-display" style="margin-top:.5rem"></div>
+   <div class="field-help">Up to 12 skills</div>
+  </div>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-edit-profile')">Cancel</button>
+   <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+  </div>
+ </div>
+</div>
+
+<!-- CHANGE PASSWORD -->
+<div class="ov" id="ov-change-pass">
+ <div class="modal">
+  <button class="m-close" onclick="closeOv('ov-change-pass')">✕</button>
+  <div class="m-title">🔑 Change Password</div>
+  <div class="field"><label>Current Password</label><input type="password" id="cp-cur" placeholder="••••••••"></div>
+  <div class="field"><label>New Password</label><input type="password" id="cp-new" placeholder="Min. 6 characters"></div>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-change-pass')">Cancel</button>
+   <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+  </div>
+ </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="ov" id="ov-confirm">
+ <div class="modal" style="max-width:400px">
+  <div class="m-title" id="cf-title">Are you sure?</div>
+  <div class="m-sub" id="cf-msg"></div>
+  <div class="m-acts">
+   <button class="btn btn-ghost" onclick="closeOv('ov-confirm')">Cancel</button>
+   <button class="btn btn-red" id="cf-ok">Confirm</button>
+  </div>
+ </div>
+</div>
+
+<script>
+// ═══════════════════ GLOBALS ═══════════════════
+const API = (location.protocol.startsWith('http') ? location.origin : 'http://localhost:5000') + '/api';
+let TOKEN = localStorage.getItem('nv_token') || '';
+let ME    = JSON.parse(localStorage.getItem('nv_user') || 'null');
+let ALL_DOCS = [];
+let CUR_DOC  = null;
+let CUR_VER  = null;
+let CUR_IS_HEAD = false;
+let JOIN_DOC_ID = null;
+let SELECTED_VIS = 'public';
+
+const AVATAR_COLORS = ['#5b8cff','#a855f7','#22d3ee','#22c55e','#f59e0b','#f97316','#ec4899','#ef4444','#6366f1','#a78bfa'];
+
+// ═══════════════════ HTTP ═══════════════════
+async function http(method, path, body, isForm) {
+  const opts = { method, headers: { Authorization: `Bearer ${TOKEN}` } };
+  if (body) {
+    if (isForm) opts.body = body;
+    else { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  }
+  const res  = await fetch(`${API}${path}`, opts);
+  const data = await res.json();
+  if (!data.success) { const err = new Error(data.message || 'Request failed'); err.data = data; throw err; }
+  return data;
+}
+
+// ═══════════════════ TOAST ═══════════════════
+function toast(msg, type='info') {
+  const icons = { success:'✅', error:'❌', info:'ℹ️', warn:'⚠️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${esc(msg)}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ═══════════════════ MODAL ═══════════════════
+function openOv(id) {
+  document.getElementById(id).classList.add('show');
+  if (id === 'ov-requests') loadAllRequests();
+  if (id === 'ov-edit-profile') openEditProfile();
+}
+function closeOv(id) { document.getElementById(id).classList.remove('show'); }
+document.addEventListener('click', e => {
+  document.querySelectorAll('.ov.show').forEach(ov => {
+    if (e.target === ov) ov.classList.remove('show');
+  });
+  if (!e.target.closest('#user-dropdown')) {
+    document.getElementById('dd-menu').classList.remove('show');
+  }
+});
+
+function confirmAction(title, msg, onOk) {
+  document.getElementById('cf-title').textContent = title;
+  document.getElementById('cf-msg').textContent = msg;
+  const btn = document.getElementById('cf-ok');
+  btn.replaceWith(btn.cloneNode(true));
+  document.getElementById('cf-ok').addEventListener('click', () => {
+    closeOv('ov-confirm'); onOk();
+  });
+  openOv('ov-confirm');
+}
+
+// ═══════════════════ AUTH ═══════════════════
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => {
+    t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register'));
+  });
+  document.querySelectorAll('.auth-form-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  const bottom = document.getElementById('auth-bottom');
+  if (tab === 'login')    bottom.innerHTML = `New here? <span onclick="switchAuthTab('register')">Create an account</span>`;
+  if (tab === 'register') bottom.innerHTML = `Already have an account? <span onclick="switchAuthTab('login')">Sign in</span>`;
+}
+
+async function doLogin() {
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const d = await http('POST', '/auth/login', {
+      email: document.getElementById('l-email').value,
+      password: document.getElementById('l-pass').value
+    });
+    saveSession(d.token, d.user); bootApp();
+  } catch(e) { toast(e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Sign In →'; }
+}
+
+async function doRegister() {
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  try {
+    const d = await http('POST', '/auth/register', {
+      name:       document.getElementById('r-name').value,
+      email:      document.getElementById('r-email').value,
+      password:   document.getElementById('r-pass').value,
+      title:      document.getElementById('r-title').value,
+      department: document.getElementById('r-dept').value
+    });
+    saveSession(d.token, d.user); bootApp();
+    toast('Welcome to NEXUSvault!', 'success');
+  } catch(e) { toast(e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Create Account →'; }
+}
+
+function saveSession(token, user) {
+  TOKEN = token; ME = user;
+  localStorage.setItem('nv_token', token);
+  localStorage.setItem('nv_user', JSON.stringify(user));
+}
+
+function doLogout() {
+  TOKEN=''; ME=null;
+  localStorage.removeItem('nv_token');
+  localStorage.removeItem('nv_user');
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('auth-page').classList.add('show');
+  switchAuthTab('login');
+}
+
+function toggleDropdown() { document.getElementById('dd-menu').classList.toggle('show'); }
+
+// ═══════════════════ BOOT ═══════════════════
+async function bootApp() {
+  document.getElementById('auth-page').classList.remove('show');
+  document.getElementById('app').classList.add('show');
+
+  const av = document.getElementById('avatar-btn');
+  av.textContent = (ME.name||'U')[0].toUpperCase();
+  av.style.background = ME.avatarColor || '#5b8cff';
+  document.getElementById('home-greeting').textContent = `Welcome back, ${ME.name?.split(' ')[0]} 👋`;
+  document.getElementById('dd-name').textContent = ME.name || 'Signed in';
+
+  await loadDocs();
+  renderHomeStats();
+  checkPendingRequests();
+}
+
+// ═══════════════════ VIEWS ═══════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById(`view-${name}`)?.classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  document.getElementById('dd-menu').classList.remove('show');
+
+  if (name === 'home')    { renderHomeStats(); renderHomeRecent(); }
+  if (name === 'projects'){ renderGrid('projects-grid', ALL_DOCS); }
+  if (name === 'my')      { renderGrid('my-grid', ALL_DOCS.filter(d => d.isHead || d.userRole === 'editor' || d.userRole === 'viewer' && d.ownerId?.toString() === ME._id)); }
+  if (name === 'starred') { renderGrid('starred-grid', ALL_DOCS.filter(d => d.isStarred)); }
+  if (name === 'private') { renderGrid('private-grid', ALL_DOCS.filter(d => d.visibility === 'private')); }
+  if (name === 'people')  { loadPeople(); }
+  if (name === 'profile') { renderProfile(ME._id); }
+}
+
+// ═══════════════════ LOAD DOCS ═══════════════════
+async function loadDocs() {
+  try {
+    const d = await http('GET', '/documents');
+    ALL_DOCS = d.documents || [];
+    renderGrid('projects-grid', ALL_DOCS);
+    renderHomeRecent();
+    renderHomeStats();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+let searchTimer;
+function handleSearch(q) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    if (!q.trim()) { renderGrid('projects-grid', ALL_DOCS); return; }
+    const re = new RegExp(q.trim(),'i');
+    const filtered = ALL_DOCS.filter(d => re.test(d.title) || re.test(d.description||'') || (d.tags||[]).some(t => re.test(t)));
+    showView('projects');
+    renderGrid('projects-grid', filtered);
+  }, 250);
+}
+
+let activeFilter = 'all';
+function setFilter(cat, el) {
+  document.querySelectorAll('#view-projects .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = cat;
+  const filtered = cat === 'all' ? ALL_DOCS : ALL_DOCS.filter(d => d.category === cat);
+  renderGrid('projects-grid', filtered);
+}
+
+// ═══════════════════ RENDER DOCS ═══════════════════
+function fileIcon(fname='',mime='',isProject=false) {
+  if (isProject) return '📁';
+  const ext = (fname.split('.').pop()||'').toLowerCase();
+  const icons = { pdf:'📄', zip:'📦', jpg:'🖼️', jpeg:'🖼️', png:'🖼️', gif:'🖼️', webp:'🖼️', svg:'🎨',
+    mp4:'🎬', mp3:'🎵', doc:'📝', docx:'📝', xls:'📊', xlsx:'📊', csv:'📊',
+    js:'⚡', ts:'⚡', jsx:'⚡', tsx:'⚡', py:'🐍', java:'☕', cpp:'⚙️', json:'📋',
+    html:'🌐', css:'🎨', md:'📋', txt:'📄', sh:'⚙️', sql:'🗄️' };
+  return icons[ext] || '📄';
+}
+
+function fmtSize(b) {
+  if(!b) return '';
+  if(b<1024) return b+'B';
+  if(b<1024*1024) return (b/1024).toFixed(1)+'KB';
+  return (b/1024/1024).toFixed(1)+'MB';
+}
+
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : ''; }
+
+const CAT_COLORS = { Report:'#5b8cff', Technical:'#22d3ee', Design:'#a855f7', Proposal:'#22c55e', Legal:'#f59e0b', HR:'#ec4899', Other:'#6b7280' };
+
+function renderCard(doc) {
+  const lv = doc.latestVersion;
+  const color = CAT_COLORS[doc.category] || '#6b7280';
+  const ico   = fileIcon(lv?.fileName, lv?.mimeType, lv?.isProject);
+  const isMine = doc.isHead;
+  const pendingReq = doc.pendingRequests > 0 && isMine;
+
+  return `<div class="doc-card" onclick="openDoc('${doc._id}')">
+    <span class="dc-vis ${doc.visibility}">${doc.visibility === 'private' ? '🔒 Private' : '🌍 Public'}</span>
+    ${isMine && doc.visibility==='private' ? `<span class="dc-head-badge">★ HEAD</span>` : ''}
+    ${pendingReq ? `<span class="dc-pending">${doc.pendingRequests} pending</span>` : ''}
+    <div class="dc-top">
+      <div class="dc-icon" style="background:${color}1f;color:${color}">${ico}</div>
+      <div style="min-width:0;flex:1">
+        <div class="dc-title">${esc(doc.title)}</div>
+        <div class="dc-owner">by ${esc(doc.ownerName)}</div>
+      </div>
+    </div>
+    ${doc.description ? `<div class="dc-desc">${esc(doc.description)}</div>` : ''}
+    <div class="dc-meta">
+      <span class="dc-cat">${doc.category}</span>
+      ${(doc.tags||[]).slice(0,2).map(t=>`<span class="dc-tag">${esc(t)}</span>`).join('')}
+    </div>
+    <div class="dc-bottom">
+      <span class="dc-stat">🕐 ${fmtDate(doc.updatedAt)}</span>
+      <span class="dc-stat">📋 v${lv?.versionNumber||'1.0'}</span>
+      <span class="dc-stat">👥 ${doc.memberCount||0}</span>
+      <span class="dc-stat" style="color:${doc.isStarred?'var(--yellow)':'var(--text3)'}">${doc.isStarred?'★':'☆'} ${doc.starCount||0}</span>
+    </div>
+  </div>`;
+}
+
+function renderGrid(id, docs) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!docs.length) {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="es-icon">📭</div>
+      <h3>No projects found</h3>
+      <p>Upload a project or join one with an access code</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = docs.map(renderCard).join('');
+}
+
+function renderHomeRecent() {
+  renderGrid('home-recent', ALL_DOCS.slice(0, 6));
+}
+
+function renderHomeStats() {
+  const total = ALL_DOCS.length;
+  const mine  = ALL_DOCS.filter(d => d.isHead).length;
+  const pub   = ALL_DOCS.filter(d => d.visibility === 'public').length;
+  const priv  = ALL_DOCS.filter(d => d.visibility === 'private').length;
+  const stars = ALL_DOCS.filter(d => d.isStarred).length;
+  document.getElementById('home-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Accessible</div><span class="stat-icon">📁</span></div>
+    <div class="stat-card"><div class="stat-value">${mine}</div><div class="stat-label">Led by Me</div><span class="stat-icon">★</span></div>
+    <div class="stat-card"><div class="stat-value">${pub}</div><div class="stat-label">Public</div><span class="stat-icon">🌍</span></div>
+    <div class="stat-card"><div class="stat-value">${priv}</div><div class="stat-label">Private</div><span class="stat-icon">🔒</span></div>
+    <div class="stat-card"><div class="stat-value">${stars}</div><div class="stat-label">Starred</div><span class="stat-icon">✨</span></div>
+  `;
+}
+
+// ═══════════════════ UPLOAD ═══════════════════
+function openUpload() {
+  SELECTED_VIS = 'public';
+  setVis('public');
+  clearFile();
+  ['up-title','up-desc','up-tags','up-msg'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('up-cat').value = 'Other';
+  openOv('ov-upload');
+}
+
+function setVis(v) {
+  SELECTED_VIS = v;
+  document.getElementById('vis-pub').classList.toggle('selected', v==='public');
+  document.getElementById('vis-priv').classList.toggle('selected', v==='private');
+}
+
+let selectedFile = null;
+function handleFileSelect(inp) { if(inp.files[0]) setFile(inp.files[0]); }
+function handleDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('drag'); if(e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); }
+
+function setFile(file) {
+  selectedFile = file;
+  const ico = fileIcon(file.name,'',file.name.endsWith('.zip'));
+  document.getElementById('up-file-icon').textContent = ico;
+  document.getElementById('up-file-name').textContent = file.name;
+  document.getElementById('up-file-size').textContent = fmtSize(file.size) + (file.name.endsWith('.zip') ? ' — ZIP / Folder' : '');
+  document.getElementById('upload-preview').style.display = 'flex';
+}
+function clearFile() { selectedFile=null; document.getElementById('up-file').value=''; document.getElementById('upload-preview').style.display='none'; }
+
+async function doUpload() {
+  const title = document.getElementById('up-title').value.trim();
+  if (!title) { toast('Title is required','error'); return; }
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Uploading...';
+  try {
+    const fd = new FormData();
+    fd.append('title', title);
+    fd.append('description', document.getElementById('up-desc').value);
+    fd.append('category', document.getElementById('up-cat').value);
+    fd.append('tags', document.getElementById('up-tags').value);
+    fd.append('message', document.getElementById('up-msg').value || 'Initial upload');
+    fd.append('visibility', SELECTED_VIS);
+    if (selectedFile) fd.append('file', selectedFile);
+
+    const d = await http('POST', '/documents', fd, true);
+    closeOv('ov-upload');
+    toast('Project created!','success');
+    await loadDocs();
+    if (d.accessCode) showCodeDisplay(d.accessCode);
+  } catch(e) { toast(e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='🚀 Create Project'; }
+}
+
+function showCodeDisplay(code) {
+  const digits = document.getElementById('code-show-digits');
+  digits.innerHTML = code.split('').map(d=>`<div class="code-digit">${d}</div>`).join('');
+  window._lastCode = code;
+  openOv('ov-code-show');
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(window._lastCode || '');
+  toast('Code copied!','success');
+}
+
+// ═══════════════════ OPEN DOCUMENT ═══════════════════
+async function openDoc(id) {
+  try {
+    const d = await http('GET', `/documents/${id}`);
+    CUR_DOC = d.document;
+    CUR_IS_HEAD = !!d.isHead;
+    populateDetail();
+    openOv('ov-detail');
+  } catch(e) {
+    if (e.message.includes('Access denied') || e.data?.requiresCode) {
+      JOIN_DOC_ID = id;
+      openOv('ov-join');
+      toast('This is a private project. Enter the access code.','warn');
+    } else { toast(e.message,'error'); }
+  }
+}
+
+function populateDetail() {
+  const doc = CUR_DOC;
+  const isHead = CUR_IS_HEAD;
+  const myMember = (doc.members||[]).find(m => m.user?.toString() === ME._id);
+  const canEdit = isHead || (myMember && myMember.role === 'editor' && !myMember.isBlocked);
+  const isStarred = (doc.stars||[]).some(s => s.toString() === ME._id);
+  const starCount = (doc.stars||[]).length;
+
+  document.getElementById('det-title').textContent = doc.title;
+  document.getElementById('det-desc').textContent = doc.description || '';
+  document.getElementById('det-owner').textContent = `by ${doc.ownerName}`;
+  document.getElementById('det-date').textContent = `· ${fmtDate(doc.updatedAt)}`;
+  document.getElementById('det-stars').innerHTML = `· <span style="color:${isStarred?'var(--yellow)':'var(--text3)'}">${isStarred?'★':'☆'}</span> ${starCount}`;
+  document.getElementById('det-vis-badge').innerHTML =
+    `<span class="dc-vis ${doc.visibility}" style="position:static">${doc.visibility === 'private' ? '🔒 Private' : '🌍 Public'}</span>`;
+  document.getElementById('det-head-badge').innerHTML =
+    isHead ? `<span class="role-badge head">★ Head</span>` : (myMember ? `<span class="role-badge ${myMember.role}">${myMember.role}</span>` : '');
+
+  // Version select
+  const sel = document.getElementById('det-ver-select');
+  sel.innerHTML = doc.versions.map(v =>
+    `<option value="${v.versionNumber}">v${v.versionNumber} — ${esc(v.message)}</option>`
+  ).join('');
+  sel.value = doc.versions[doc.versions.length-1]?.versionNumber;
+
+  // Actions
+  const acts = document.getElementById('det-actions');
+  let html = `<button class="btn btn-ghost btn-sm" onclick="toggleStar()">${isStarred?'★ Starred':'☆ Star'}</button>`;
+  if (isHead) {
+    html += `<button class="btn btn-ghost btn-sm" onclick="openMembers()">👥 Members</button>`;
+    html += `<button class="btn btn-red btn-sm" onclick="deleteCurrentProject()">🗑 Delete Project</button>`;
+  }
+  acts.innerHTML = html;
+
+  document.getElementById('btn-new-ver').style.display = canEdit ? '' : 'none';
+
+  // Diff selects
+  const dv1 = document.getElementById('diff-v1');
+  const dv2 = document.getElementById('diff-v2');
+  dv1.innerHTML = dv2.innerHTML = doc.versions.map(v=>`<option value="${v.versionNumber}">v${v.versionNumber}</option>`).join('');
+  if (doc.versions.length > 1) {
+    dv1.value = doc.versions[doc.versions.length-2].versionNumber;
+    dv2.value = doc.versions[doc.versions.length-1].versionNumber;
+  }
+
+  loadVersion(sel.value);
+  loadComments();
+  updateMembersBox();
+}
+
+function loadVersion(vNum) {
+  CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === vNum);
+  if (!CUR_VER) return;
+
+  const dlUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/download`;
+  const prvUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/preview`;
+  document.getElementById('det-dl-btn').href = dlUrl;
+  document.getElementById('det-dl-btn').download = CUR_VER.fileName || 'download';
+
+  document.getElementById('det-ver-info').innerHTML = `
+    <span style="color:var(--accent);font-weight:600;font-family:var(--display)">v${CUR_VER.versionNumber}</span> ·
+    ${esc(CUR_VER.uploaderName)} · ${fmtDate(CUR_VER.createdAt)}<br>
+    <span style="color:var(--text3)">${esc(CUR_VER.message)}</span>
+    ${CUR_VER.fileName ? `<br><span style="font-family:var(--mono);font-size:11px;color:var(--text3)">${esc(CUR_VER.fileName)} ${fmtSize(CUR_VER.fileSize)}</span>` : ''}
+  `;
+
+  // Show delete-version button only if head AND >1 versions
+  const delBtn = document.getElementById('btn-del-ver');
+  delBtn.style.display = (CUR_IS_HEAD && CUR_DOC.versions.length > 1) ? '' : 'none';
+
+  loadComments();
+  renderVersionContent(CUR_VER, prvUrl, dlUrl);
+}
+
+function renderVersionContent(v, prvUrl, dlUrl) {
+  const container = document.getElementById('det-viewer');
+
+  if (v.isProject && v.projectTree?.length) {
+    container.innerHTML = `<div class="file-viewer">
+      <div class="fv-tree" id="fv-tree-panel"></div>
+      <div class="fv-content" id="fv-content-panel">
+        <div class="fv-empty"><div class="fe-icon">📂</div><span>Select a file to view</span></div>
+      </div>
+    </div>`;
+    renderTree(v.projectTree, document.getElementById('fv-tree-panel'));
+    return;
+  }
+
+  const ext = (v.fileName||'').split('.').pop().toLowerCase();
+  const mime = v.mimeType || '';
+
+  if (mime.includes('pdf') || ext === 'pdf') {
+    container.innerHTML = `<div class="file-viewer" style="height:460px"><div class="fv-content" style="flex:1"><iframe src="${prvUrl}" title="PDF" style="width:100%;height:100%;border:none"></iframe></div></div>`;
+  } else if (mime.startsWith('image/') || ['jpg','jpeg','png','gif','webp','svg'].includes(ext)) {
+    container.innerHTML = `<div style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center">
+      <img src="${prvUrl}" alt="${esc(v.fileName)}" style="max-width:100%;max-height:400px;border-radius:8px">
+    </div>`;
+  } else if (ext === 'csv' && v.content) {
+    container.innerHTML = `<div style="overflow:auto;max-height:380px;border:1px solid var(--border);border-radius:var(--r)">${parseCsvTable(v.content)}</div>`;
+  } else if (ext === 'json' && v.content) {
+    let p = v.content; try { p = JSON.stringify(JSON.parse(v.content),null,2); } catch {}
+    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:380px;overflow:auto;color:var(--text2)">${esc(p)}</pre>`;
+  } else if (['doc','docx','xls','xlsx','pptx'].includes(ext)) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="es-icon">${ext.includes('xl')?'📊':ext.includes('ppt')?'📊':'📝'}</div>
+      <h3>${esc(v.fileName)}</h3>
+      <p>This file type cannot be previewed in the browser.</p>
+      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download to Open</a>
+    </div>`;
+  } else if (v.content) {
+    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:380px;overflow:auto;color:var(--text2);white-space:pre-wrap;word-break:break-all">${esc(v.content)}</pre>`;
+  } else {
+    container.innerHTML = `<div class="empty-state">
+      <div class="es-icon">📄</div>
+      <h3>${esc(v.fileName || 'File')}</h3>
+      <p>${fmtSize(v.fileSize)} — No preview available</p>
+      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download</a>
+    </div>`;
+  }
+}
+
+// ═══════════════════ STAR / DELETE ═══════════════════
+async function toggleStar() {
+  try {
+    const d = await http('POST', `/documents/${CUR_DOC._id}/star`);
+    toast(d.isStarred ? 'Starred!' : 'Unstarred', 'success');
+    // refresh card list
+    await loadDocs();
+    const fresh = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = fresh.document; CUR_IS_HEAD = !!fresh.isHead;
+    populateDetail();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function deleteCurrentVersion() {
+  if (!CUR_VER) return;
+  confirmAction('Delete version?', `Permanently delete v${CUR_VER.versionNumber}? This cannot be undone.`, async () => {
+    try {
+      await http('DELETE', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}`);
+      toast('Version deleted','success');
+      const d = await http('GET', `/documents/${CUR_DOC._id}`);
+      CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+      populateDetail();
+      await loadDocs();
+    } catch(e) { toast(e.message,'error'); }
+  });
+}
+
+function deleteCurrentProject() {
+  if (!CUR_DOC) return;
+  confirmAction('Delete entire project?', `This will permanently delete "${CUR_DOC.title}" and ALL its versions. This cannot be undone.`, async () => {
+    try {
+      await http('DELETE', `/documents/${CUR_DOC._id}`);
+      toast('Project deleted','success');
+      closeOv('ov-detail');
+      CUR_DOC = null; CUR_VER = null;
+      await loadDocs();
+    } catch(e) { toast(e.message,'error'); }
+  });
+}
+
+// ═══════════════════ FILE TREE ═══════════════════
+function renderTree(nodes, container, depth=0) {
+  nodes.forEach(node => {
+    const row = document.createElement('div');
+    row.className = 'tree-node';
+    row.innerHTML = `<div class="tree-row" style="padding-left:${.5 + depth*.8}rem">
+      ${node.type==='folder' ? '<span class="tree-toggle">▶</span>' : '<span style="width:12px"></span>'}
+      <span class="tr-ic">${node.type==='folder'?'📁':fileIcon(node.name)}</span>
+      <span class="tr-name">${esc(node.name)}</span>
+    </div>`;
+
+    if (node.type === 'folder' && node.children?.length) {
+      const children = document.createElement('div');
+      children.className = 'tree-children';
+      children.style.display = 'none';
+      renderTree(node.children, children, depth+1);
+      row.appendChild(children);
+      row.querySelector('.tree-row').addEventListener('click', () => {
+        const tog = row.querySelector('.tree-toggle');
+        const isOpen = children.style.display !== 'none';
+        children.style.display = isOpen ? 'none' : 'block';
+        tog.classList.toggle('open', !isOpen);
+      });
+    } else if (node.type === 'file') {
+      row.querySelector('.tree-row').addEventListener('click', () => {
+        document.querySelectorAll('.tree-row.selected').forEach(r => r.classList.remove('selected'));
+        row.querySelector('.tree-row').classList.add('selected');
+        showFileContent(node);
+      });
+    }
+    container.appendChild(row);
+  });
+}
+
+function showFileContent(node) {
+  const panel = document.getElementById('fv-content-panel');
+  if (!panel) return;
+  const ext = (node.name||'').split('.').pop().toLowerCase();
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
+    panel.innerHTML = `<div class="fv-empty"><div class="fe-icon">🖼️</div><span>${esc(node.name)}</span></div>`;
+  } else if (node.content) {
+    panel.innerHTML = `<pre>${esc(node.content)}</pre>`;
+  } else {
+    panel.innerHTML = `<div class="fv-empty"><div class="fe-icon">${fileIcon(node.name)}</div><span>${esc(node.name)}</span><span style="font-size:11px">${fmtSize(node.fileSize||0)}</span></div>`;
+  }
+}
+
+// ═══════════════════ COMMENTS ═══════════════════
+function loadComments() {
+  const v = CUR_VER;
+  if (!v) return;
+  const el = document.getElementById('det-comments');
+  if (!v.comments?.length) {
+    el.innerHTML = '<p style="color:var(--text3);font-size:12px;text-align:center;padding:.5rem">No comments yet — be the first to comment</p>';
+    return;
+  }
+  el.innerHTML = v.comments.map(c => {
+    const canDel = c.user?.toString() === ME._id || CUR_IS_HEAD;
+    return `<div style="display:flex;gap:.6rem;margin-bottom:.75rem;align-items:flex-start">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff">${esc(c.userName[0])}</div>
+      <div style="flex:1">
+        <span style="font-size:12px;font-weight:600">${esc(c.userName)}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:.4rem">${fmtDate(c.createdAt)}</span>
+        <div style="font-size:13px;color:var(--text2);margin-top:2px">${esc(c.text)}</div>
+      </div>
+      ${canDel ? `<button class="up-clear" onclick="deleteComment('${c._id}')" title="Delete">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function postComment() {
+  const inp = document.getElementById('comment-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  try {
+    await http('POST', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}/comments`, { text });
+    inp.value = '';
+    const d = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+    CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === CUR_VER.versionNumber);
+    loadComments();
+    toast('Comment posted','success');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function deleteComment(cid) {
+  try {
+    await http('DELETE', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}/comments/${cid}`);
+    const d = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+    CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === CUR_VER.versionNumber);
+    loadComments();
+    toast('Comment deleted','success');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function updateMembersBox() {
+  const box = document.getElementById('det-members-box');
+  if (!box) return;
+  const doc = CUR_DOC;
+  if (!CUR_IS_HEAD) { box.innerHTML = ''; return; }
+  const pending = (doc.accessRequests||[]).filter(r => r.status === 'pending').length;
+  box.innerHTML = `
+    <div class="sh">Access Overview</div>
+    <div style="font-size:13px;color:var(--text2)">
+      👥 ${doc.members?.length||0} member${doc.members?.length===1?'':'s'}<br>
+      ${pending ? `<span style="color:var(--yellow)">⏳ ${pending} pending request${pending>1?'s':''}</span><br>` : ''}
+      ${doc.visibility==='private' ? `🔐 Code: <span style="font-family:var(--mono);color:var(--accent)">${doc.accessCode||'—'}</span>` : ''}
+    </div>
+  `;
+}
+
+// ═══════════════════ NEW VERSION ═══════════════════
+function openNewVersion() {
+  document.getElementById('nv-sub').textContent = `Adding new version to: ${CUR_DOC?.title}`;
+  clearNVFile();
+  document.getElementById('nv-msg').value = '';
+  openOv('ov-new-version');
+}
+
+let nvFile = null;
+function handleNVFile(inp) { if(inp.files[0]) setNVFile(inp.files[0]); }
+function handleDropNV(e) { e.preventDefault(); e.currentTarget.classList.remove('drag'); if(e.dataTransfer.files[0]) setNVFile(e.dataTransfer.files[0]); }
+function setNVFile(file) {
+  nvFile = file;
+  document.getElementById('nv-file-icon').textContent = fileIcon(file.name,'',file.name.endsWith('.zip'));
+  document.getElementById('nv-file-name').textContent = file.name;
+  document.getElementById('nv-file-size').textContent = fmtSize(file.size);
+  document.getElementById('nv-preview').style.display = 'flex';
+}
+function clearNVFile() { nvFile=null; document.getElementById('nv-file').value=''; document.getElementById('nv-preview').style.display='none'; }
+
+async function doNewVersion() {
+  const msg = document.getElementById('nv-msg').value.trim();
+  if (!msg) { toast('Version note required','error'); return; }
+  try {
+    const fd = new FormData();
+    fd.append('message', msg);
+    fd.append('bumpType', document.getElementById('nv-bump').value);
+    if (nvFile) fd.append('file', nvFile);
+    await http('POST', `/documents/${CUR_DOC._id}/versions`, fd, true);
+    closeOv('ov-new-version');
+    toast('New version uploaded!','success');
+    const d = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+    populateDetail();
+    await loadDocs();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ DIFF ═══════════════════
+function openDiff() { openOv('ov-diff'); document.getElementById('diff-result').innerHTML = ''; TREE_DIFF=null; OPEN_DIRS=new Set(); SEL_FILE=null; }
+
+// State for tree comparison (shared between v1 and v2 panels for sync)
+let TREE_DIFF = null;          // server payload
+let OPEN_DIRS = new Set();     // expanded folder paths (without trailing /)
+let SEL_FILE  = null;          // currently selected file path
+
+async function runDiff() {
+  const v1 = document.getElementById('diff-v1').value;
+  const v2 = document.getElementById('diff-v2').value;
+  if (v1 === v2) { toast('Select two different versions','warn'); return; }
+  try {
+    // Always use the richer tree-diff endpoint. It works for single files too.
+    const d = await http('GET', `/documents/${CUR_DOC._id}/tree-diff?v1=${v1}&v2=${v2}`);
+    TREE_DIFF = d; OPEN_DIRS = new Set(); SEL_FILE = null;
+    const container = document.getElementById('diff-result');
+
+    if (d.isProject) {
+      renderTreeCompare();
+      return;
+    }
+
+    // Single file → fall back to the line diff (call file-diff for precision)
+    const fname = d.versionA.fileName || d.versionB.fileName || 'file';
+    const fd = await http('GET', `/documents/${CUR_DOC._id}/file-diff?v1=${v1}&v2=${v2}&path=${encodeURIComponent(fname)}`);
+    container.innerHTML = renderFileDiffHtml(fd, d.versionA, d.versionB);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function renderTreeCompare() {
+  const d = TREE_DIFF;
+  const container = document.getElementById('diff-result');
+  const t = d.totals;
+  container.innerHTML = `
+    <div class="tcmp-stats">
+      <span class="pill" style="color:#86efac">+${t.added} added</span>
+      <span class="pill" style="color:#fca5a5">−${t.removed} removed</span>
+      <span class="pill" style="color:#fcd34d">~${t.modified} modified</span>
+      <span class="pill">${t.same} unchanged</span>
+    </div>
+    <div class="tcmp-wrap">
+      <div class="tcmp-head">
+        <div>v${d.versionA.number} — ${esc(d.versionA.message)} (${esc(d.versionA.author)})</div>
+        <div>v${d.versionB.number} — ${esc(d.versionB.message)} (${esc(d.versionB.author)})</div>
+      </div>
+      <div class="tcmp-body">
+        <div class="tcmp-col" id="tcmp-a">${renderTreeSide(d.versionA.tree || [], 'A', '')}</div>
+        <div class="tcmp-col" id="tcmp-b">${renderTreeSide(d.versionB.tree || [], 'B', '')}</div>
+      </div>
+    </div>
+    <div id="tcmp-file-diff" style="margin-top:1rem"></div>
+    <p style="font-size:11px;color:var(--text3);margin-top:.5rem">💡 Click a folder to expand it (the other side mirrors automatically). Click a file to see the line-level diff below.</p>
+  `;
+}
+
+// Render one side. Walk each node; if a folder, render header then children
+// (only when in OPEN_DIRS). For folders/files missing on the OTHER side we
+// also need to render placeholders so rows align — we instead render a UNION
+// of paths derived from fileStatus.
+function renderTreeSide(_treeIgnored, side, _parentPath) {
+  // We render based on the union of paths from fileStatus to keep both
+  // panels perfectly aligned row-by-row.
+  const d = TREE_DIFF;
+  const own = side === 'A' ? d.versionA.tree : d.versionB.tree;
+  // Build a path → node map for own side so we know what exists locally.
+  const ownSet = new Set();
+  (function walk(nodes, prefix){
+    (nodes||[]).forEach(n => {
+      const p = prefix ? prefix + '/' + n.name : n.name;
+      if (n.type === 'folder') { ownSet.add(p + '/'); walk(n.children, p); }
+      else ownSet.add(p);
+    });
+  })(own || [], '');
+
+  // Sort union paths so folders come before their contents.
+  const paths = Object.keys(d.fileStatus).sort();
+
+  // Aggregate per-folder change counts from descendant FILES.
+  // folderChanges[folderPath] = { added, modified, removed }
+  const folderChanges = {};
+  function bump(folder, key){
+    if (!folderChanges[folder]) folderChanges[folder] = {added:0, modified:0, removed:0};
+    folderChanges[folder][key]++;
+  }
+  for (const p of paths) {
+    if (p.endsWith('/')) continue; // only files contribute
+    const st = d.fileStatus[p].status;
+    if (st === 'same') continue;
+    const segs = p.split('/');
+    // walk every ancestor folder
+    for (let i = 1; i < segs.length; i++) {
+      const folder = segs.slice(0, i).join('/');
+      if (st === 'added') bump(folder, 'added');
+      else if (st === 'removed') bump(folder, 'removed');
+      else if (st === 'modified') bump(folder, 'modified');
+    }
+  }
+
+  let html = '';
+  for (const p of paths) {
+    const isFolder = p.endsWith('/');
+    const cleanPath = isFolder ? p.slice(0,-1) : p;
+    const segs = cleanPath.split('/');
+    const depth = segs.length - 1;
+    const name  = segs[segs.length - 1];
+
+    // Hide rows whose parent folder is not expanded
+    if (depth > 0) {
+      const parent = segs.slice(0, -1).join('/');
+      if (!OPEN_DIRS.has(parent)) continue;
+    }
+
+    const status = d.fileStatus[p].status;     // added | removed | modified | same
+    const existsHere = ownSet.has(p);
+    let cls = status;
+    if (!existsHere) cls = 'missing';
+
+    const indent = '&nbsp;&nbsp;'.repeat(depth);
+    if (isFolder) {
+      const open = OPEN_DIRS.has(cleanPath);
+      const twig = existsHere ? (open ? '▾' : '▸') : ' ';
+      const onclick = existsHere ? `onclick="toggleDir('${esc(cleanPath)}')"` : '';
+      const fc = folderChanges[cleanPath];
+      let dots = '';
+      let extraCls = '';
+      if (fc && (fc.added || fc.modified || fc.removed)) {
+        extraCls = ' has-changes';
+        const total = fc.added + fc.modified + fc.removed;
+        dots = '<span class="chg-dots" title="'
+          + `${fc.added} added, ${fc.modified} modified, ${fc.removed} removed`
+          + '">'
+          + (fc.added    ? '<span class="chg-dot a"></span>' : '')
+          + (fc.modified ? '<span class="chg-dot m"></span>' : '')
+          + (fc.removed  ? '<span class="chg-dot r"></span>' : '')
+          + `<span class="chg-count">${total}</span>`
+          + '</span>';
+      }
+      html += `<div class="tnode ${cls}${extraCls}" ${onclick}>${indent}<span class="twig">${twig}</span>📁 ${esc(name) || '/'}${dots}</div>`;
+    } else {
+      const sel = SEL_FILE === p ? ' sel' : '';
+      const onclick = existsHere || (status==='removed'||status==='added')
+        ? `onclick="selectDiffFile('${esc(p)}')"` : '';
+      const icon = status === 'added' ? '➕' : status === 'removed' ? '➖' : status === 'modified' ? '✎' : '📄';
+      html += `<div class="tnode ${cls}${sel}" ${onclick}>${indent}<span class="twig"> </span>${icon} ${esc(name)}</div>`;
+    }
+  }
+  return html || '<div style="padding:.6rem;color:var(--text3);font-size:11px">empty</div>';
+}
+
+function toggleDir(p) {
+  if (OPEN_DIRS.has(p)) OPEN_DIRS.delete(p); else OPEN_DIRS.add(p);
+  // Re-render BOTH sides so they stay synchronized.
+  document.getElementById('tcmp-a').innerHTML = renderTreeSide(null, 'A', '');
+  document.getElementById('tcmp-b').innerHTML = renderTreeSide(null, 'B', '');
+}
+
+async function selectDiffFile(p) {
+  SEL_FILE = p;
+  document.getElementById('tcmp-a').innerHTML = renderTreeSide(null, 'A', '');
+  document.getElementById('tcmp-b').innerHTML = renderTreeSide(null, 'B', '');
+  const out = document.getElementById('tcmp-file-diff');
+  out.innerHTML = '<div style="padding:.5rem;color:var(--text3);font-size:12px">Loading diff…</div>';
+  try {
+    const v1 = TREE_DIFF.versionA.number, v2 = TREE_DIFF.versionB.number;
+    const fd = await http('GET', `/documents/${CUR_DOC._id}/file-diff?v1=${v1}&v2=${v2}&path=${encodeURIComponent(p)}`);
+    out.innerHTML = `<div style="font-size:12px;color:var(--text3);margin-bottom:.4rem">📄 ${esc(p)}</div>` +
+                    renderFileDiffHtml(fd, TREE_DIFF.versionA, TREE_DIFF.versionB);
+  } catch(e) { out.innerHTML = `<p style="color:var(--red);font-size:12px">${esc(e.message)}</p>`; }
+}
+
+function renderFileDiffHtml(d, vA, vB) {
+    const linesA = [], linesB = [];
+    d.diff.forEach(p => {
+      const cls = p.added ? 'add' : p.removed ? 'rem' : 'same';
+      const lines = (p.value||'').split('\n').filter((_,i,a) => i < a.length-1 || p.value.endsWith('\n') || i === 0);
+      lines.forEach(l => {
+        if (!p.added) linesA.push(`<div class="diff-line ${cls}">${esc(l)||' '}</div>`);
+        if (!p.removed) linesB.push(`<div class="diff-line ${cls}">${esc(l)||' '}</div>`);
+      });
+    });
+    return `
+      <div style="margin-bottom:.5rem;font-size:12px;color:var(--text3)">
+        <span style="color:var(--green)">+${d.stats.added} added</span>
+        <span style="color:var(--red);margin-left:8px">−${d.stats.removed} removed</span>
+        <span style="margin-left:8px">${d.stats.unchanged} unchanged</span>
+      </div>
+      <div class="diff-view">
+        <div class="diff-header">
+          <div class="diff-header-col">v${vA.number} — ${esc(vA.message)} (${esc(vA.author)})</div>
+          <div class="diff-header-col">v${vB.number} — ${esc(vB.message)} (${esc(vB.author)})</div>
+        </div>
+        <div class="diff-body">
+          <div class="diff-col">${linesA.join('')}</div>
+          <div class="diff-col" style="border-left:1px solid var(--border)">${linesB.join('')}</div>
+        </div>
+      </div>`;
+}
+
+// ═══════════════════ JOIN ═══════════════════
+function codeDigitInput(inp, idx) {
+  const inputs = document.querySelectorAll('#code-input-boxes input');
+  inp.value = inp.value.replace(/\D/g,'');
+  if (inp.value && idx < 5) inputs[idx+1].focus();
+}
+function codeDigitKey(e, idx) {
+  const inputs = document.querySelectorAll('#code-input-boxes input');
+  if (e.key === 'Backspace' && !inputs[idx].value && idx > 0) inputs[idx-1].focus();
+}
+
+let searchJoinTimer;
+function searchForJoin(q) {
+  clearTimeout(searchJoinTimer);
+  const results = document.getElementById('join-search-results');
+  q = (q || '').trim();
+  if (!q) { results.innerHTML=''; JOIN_DOC_ID=null; return; }
+  // New search → invalidate previous selection
+  JOIN_DOC_ID = null;
+  results.innerHTML = '<p style="font-size:12px;color:var(--text3);padding:.5rem 0">🔍 Searching…</p>';
+  searchJoinTimer = setTimeout(async () => {
+    try {
+      const r = await http('GET', `/documents/discover?q=${encodeURIComponent(q)}`);
+      const found = r.results || [];
+      if (!found.length) {
+        results.innerHTML = `<div style="padding:.75rem;text-align:center;color:var(--text3);font-size:12px;background:var(--bg3);border-radius:var(--r);border:1px dashed var(--border)">No private projects match "<b>${esc(q)}</b>"</div>`;
+        return;
+      }
+      const header = `<div style="font-size:11px;color:var(--text3);margin:.25rem 0 .4rem;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between"><span>${found.length} result${found.length===1?'':'s'}</span><span style="color:var(--accent)">👆 click to select</span></div>`;
+      results.innerHTML = header + found.map(d => {
+        let tag;
+        if (d.isBlocked)      tag = '<span style="color:var(--red);font-size:11px;font-weight:600">⛔ blocked</span>';
+        else if (d.isHead)    tag = '<span style="color:var(--accent);font-size:11px;font-weight:600">★ you are head</span>';
+        else if (d.isMember)  tag = '<span style="color:var(--green);font-size:11px;font-weight:600">✓ member</span>';
+        else if (d.hasPending)tag = '<span style="color:var(--yellow);font-size:11px;font-weight:600">⏳ pending</span>';
+        else                  tag = `<span style="color:var(--text3);font-size:11px">${d.memberCount} member${d.memberCount===1?'':'s'}</span>`;
+        const titleHtml = highlightMatch(d.title, q);
+        const safeTitle = esc(d.title).replace(/'/g,"\\'");
+        const selected  = JOIN_DOC_ID===d._id;
+        return `
+        <div class="join-result" data-id="${d._id}" style="padding:.6rem .75rem;border-radius:var(--r);background:${selected?'var(--bg4,var(--bg3))':'var(--bg3)'};cursor:pointer;font-size:13px;margin-bottom:.3rem;border:1px solid ${selected?'var(--accent)':'var(--border)'};transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:.5rem" onclick="selectJoinDoc('${d._id}','${safeTitle}',this)" onmouseover="if(!this.classList.contains('sel'))this.style.borderColor='var(--text3)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border)'">
+          <div style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🔒 <b>${titleHtml}</b> <span style="color:var(--text3);font-size:11px;font-weight:400">· by ${esc(d.ownerName)}</span></div>
+          <div style="flex-shrink:0">${tag}</div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      results.innerHTML = `<p style="font-size:12px;color:var(--red)">${esc(e.message)}</p>`;
+    }
+  }, 150);
+}
+
+function highlightMatch(text, q) {
+  const safe = esc(text);
+  if (!q) return safe;
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+  return safe.replace(re, '<mark style="background:var(--accent);color:#000;padding:0 2px;border-radius:2px">$1</mark>');
+}
+
+function selectJoinDoc(id, title, el) {
+  JOIN_DOC_ID = id;
+  document.querySelectorAll('#join-search-results .join-result').forEach(d => { d.style.borderColor = 'var(--border)'; d.classList.remove('sel'); });
+  el.style.borderColor = 'var(--accent)';
+  el.classList.add('sel');
+  // Visual confirmation + jump to next step
+  const status = document.getElementById('join-status');
+  status.style.display = 'block';
+  status.style.background = 'var(--bg3)';
+  status.style.border = '1px solid var(--accent)';
+  status.style.color = 'var(--accent)';
+  status.innerHTML = `✓ Selected: <b>${esc(title)}</b> — now enter the 6-digit access code below`;
+  const firstBox = document.querySelector('#code-input-boxes input');
+  if (firstBox) firstBox.focus();
+}
+
+async function doJoin() {
+  if (!JOIN_DOC_ID) { toast('Select a project first','warn'); return; }
+  const inputs = document.querySelectorAll('#code-input-boxes input');
+  const code = Array.from(inputs).map(i => i.value).join('');
+  if (code.length < 6) { toast('Enter all 6 digits','warn'); return; }
+  const msg = document.getElementById('join-msg').value.trim();
+
+  const statusEl = document.getElementById('join-status');
+  try {
+    const d = await http('POST', `/documents/${JOIN_DOC_ID}/access`, { code, message: msg });
+    statusEl.style.display = 'block';
+    if (d.status === 'pending') {
+      statusEl.style.background = '#f59e0b18'; statusEl.style.border = '1px solid #f59e0b44'; statusEl.style.color = 'var(--yellow)';
+      statusEl.textContent = '⏳ ' + d.message;
+    } else if (d.status === 'approved' || d.isHead) {
+      statusEl.style.background = '#22c55e18'; statusEl.style.border = '1px solid #22c55e44'; statusEl.style.color = 'var(--green)';
+      statusEl.textContent = '✅ Access granted! Opening project...';
+      setTimeout(async () => {
+        closeOv('ov-join');
+        await openDoc(JOIN_DOC_ID);
+        await loadDocs();
+      }, 800);
+    }
+    inputs.forEach(i => i.value = '');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ REQUESTS ═══════════════════
+async function checkPendingRequests() {
+  let total = 0;
+  for (const doc of ALL_DOCS) {
+    if (doc.isHead) total += doc.pendingRequests || 0;
+  }
+  const badge = document.getElementById('notif-badge');
+  badge.textContent = total;
+  badge.classList.toggle('show', total > 0);
+}
+
+async function loadAllRequests() {
+  const container = document.getElementById('requests-list');
+  container.innerHTML = '<div class="loading-state"><span class="spin"></span> Loading...</div>';
+
+  const myDocs = ALL_DOCS.filter(d => d.isHead);
+  let html = '';
+  for (const doc of myDocs) {
+    try {
+      const d = await http('GET', `/documents/${doc._id}/requests`);
+      const pending = d.requests.filter(r => r.status === 'pending');
+      if (!pending.length) continue;
+      html += `<div style="margin-bottom:1rem">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:.5rem;font-family:var(--display)">📁 ${esc(doc.title)}</div>
+        ${pending.map(r => `
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--r);margin-bottom:.5rem;border:1px solid var(--border);flex-wrap:wrap">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff">${esc(r.userName[0])}</div>
+            <div style="flex:1;min-width:140px">
+              <div style="font-size:13px;font-weight:600">${esc(r.userName)}</div>
+              <div style="font-size:11px;color:var(--text3)">${esc(r.userEmail)} · ${fmtDate(r.requestedAt)}</div>
+              ${r.message ? `<div style="font-size:12px;color:var(--text2);margin-top:4px;font-style:italic">"${esc(r.message)}"</div>` : ''}
+            </div>
+            <select id="role-${r._id}" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:.3rem .5rem;color:var(--text);font-size:12px">
+              <option value="viewer">Viewer</option><option value="editor">Editor</option>
+            </select>
+            <button class="btn btn-green btn-sm" onclick="decideRequest('${doc._id}','${r._id}','approve',document.getElementById('role-${r._id}').value)">✅ Approve</button>
+            <button class="btn btn-red btn-sm" onclick="decideRequest('${doc._id}','${r._id}','reject')">❌ Reject</button>
+          </div>
+        `).join('')}
+      </div>`;
+    } catch {}
+  }
+  container.innerHTML = html || '<div class="empty-state"><div class="es-icon">✅</div><h3>All clear!</h3><p>No pending access requests</p></div>';
+}
+
+async function decideRequest(docId, reqId, action, role) {
+  try {
+    await http('PUT', `/documents/${docId}/requests/${reqId}`, { action, role });
+    toast(action === 'approve' ? 'Access approved!' : 'Request rejected', action === 'approve' ? 'success' : 'info');
+    await loadDocs();
+    loadAllRequests();
+    checkPendingRequests();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ MEMBERS (Head) ═══════════════════
+async function openMembers() {
+  if (!CUR_DOC) return;
+  openOv('ov-members');
+  try {
+    const d = await http('GET', `/documents/${CUR_DOC._id}/requests`);
+    const members = d.members || [];
+
+    document.getElementById('members-stats').innerHTML = `
+      👥 <strong>${members.length}</strong> member${members.length!==1?'s':''} ·
+      📋 <strong>${d.requests.length}</strong> total requests ·
+      ⏳ <strong>${d.requests.filter(r=>r.status==='pending').length}</strong> pending ·
+      🚫 <strong>${members.filter(m=>m.isBlocked).length}</strong> blocked
+    `;
+
+    const tbody = document.getElementById('members-tbody');
+    tbody.innerHTML = members.length ? members.map(m => `
+      <tr class="${m.isBlocked?'blocked':''}">
+        <td>
+          <div style="font-weight:600">${esc(m.userName)}</div>
+          <div style="font-size:11px;color:var(--text3)">${esc(m.email)}</div>
+        </td>
+        <td>
+          <span class="role-badge ${m.role}">${m.role}</span>
+          ${m.isBlocked?'<span class="role-badge blocked" style="margin-left:4px">blocked</span>':''}
+        </td>
+        <td style="font-size:11px;color:var(--text3)">${fmtDate(m.grantedAt)}</td>
+        <td>
+          <select onchange="changeMemberRole('${m._id}',this.value)" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 6px;font-size:11px;color:var(--text);margin-right:4px">
+            <option value="viewer" ${m.role==='viewer'?'selected':''}>Viewer</option>
+            <option value="editor" ${m.role==='editor'?'selected':''}>Editor</option>
+          </select>
+          <button class="btn btn-sm" style="background:${m.isBlocked?'var(--green)':'var(--yellow)'};color:${m.isBlocked?'#fff':'#000'};padding:2px 8px;font-size:11px" onclick="toggleMemberBlock('${m._id}')">${m.isBlocked?'Unblock':'Block'}</button>
+          <button class="btn btn-red btn-sm" style="padding:2px 8px;font-size:11px" onclick="removeMember('${m._id}','${esc(m.userName)}')">✕</button>
+        </td>
+      </tr>
+    `).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:1.5rem">No members yet</td></tr>';
+
+    if (CUR_DOC.visibility === 'private') {
+      document.getElementById('members-code-section').innerHTML = `
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+          <div class="code-display" style="margin:0">
+            ${(CUR_DOC.accessCode||'------').split('').map(d=>`<div class="code-digit" style="width:36px;height:44px;font-size:18px">${d}</div>`).join('')}
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="regenCode()">🔄 Regenerate</button>
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${CUR_DOC.accessCode||''}');toast('Copied!','success')">📋 Copy</button>
+        </div>`;
+    } else {
+      document.getElementById('members-code-section').innerHTML = '<p style="font-size:12px;color:var(--text3)">Public project — no access code needed</p>';
+    }
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function changeMemberRole(memberId, role) {
+  try {
+    await http('PUT', `/documents/${CUR_DOC._id}/members/${memberId}/role`, { role });
+    toast('Role updated','success');
+    const d = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function toggleMemberBlock(memberId) {
+  try {
+    const d = await http('PUT', `/documents/${CUR_DOC._id}/members/${memberId}/block`);
+    toast(d.message,'success');
+    const fresh = await http('GET', `/documents/${CUR_DOC._id}`);
+    CUR_DOC = fresh.document; CUR_IS_HEAD = !!fresh.isHead;
+    openMembers();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+function removeMember(memberId, name) {
+  confirmAction('Remove member?', `Remove ${name} from this project? They will lose all access.`, async () => {
+    try {
+      await http('DELETE', `/documents/${CUR_DOC._id}/members/${memberId}`);
+      toast('Member removed','success');
+      const d = await http('GET', `/documents/${CUR_DOC._id}`);
+      CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
+      openMembers();
+      await loadDocs();
+    } catch(e) { toast(e.message,'error'); }
+  });
+}
+
+async function regenCode() {
+  try {
+    const d = await http('POST', `/documents/${CUR_DOC._id}/access-code`);
+    CUR_DOC.accessCode = d.accessCode;
+    toast('New code generated!','success');
+    openMembers();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ PEOPLE ═══════════════════
+async function loadPeople() {
+  const grid = document.getElementById('people-grid');
+  grid.innerHTML = '<div class="loading-state"><span class="spin"></span> Loading people...</div>';
+  try {
+    const d = await http('GET', '/auth/users');
+    if (!d.users.length) { grid.innerHTML = '<div class="empty-state"><div class="es-icon">👥</div><h3>No people yet</h3></div>'; return; }
+    grid.innerHTML = d.users.map(u => `
+      <div class="doc-card" onclick="renderProfile('${u._id}');showView('profile')" style="text-align:center">
+        <div style="display:flex;justify-content:center;margin-top:.4rem">
+          <div class="avatar-lg" style="background:${u.avatarColor||'#5b8cff'};width:64px;height:64px;font-size:24px">${esc((u.name||'U')[0].toUpperCase())}</div>
+        </div>
+        <div class="dc-title" style="text-align:center">${esc(u.name)}</div>
+        <div class="dc-owner" style="text-align:center">${esc(u.title || u.department || '—')}</div>
+        ${u.bio?`<div class="dc-desc" style="text-align:center">${esc(u.bio)}</div>`:''}
+        <div style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:.4rem">
+          ${(u.skills||[]).slice(0,3).map(s=>`<span class="skill-pill" style="margin:0">${esc(s)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ PROFILE VIEW ═══════════════════
+async function renderProfile(userId) {
+  const c = document.getElementById('profile-content');
+  c.innerHTML = '<div class="loading-state"><span class="spin"></span> Loading profile...</div>';
+  try {
+    const d = await http('GET', `/auth/users/${userId}`);
+    const u = d.user; const s = d.stats; const recent = d.recentProjects || [];
+    const isMe = u._id === ME._id;
+    const initial = (u.name||'U')[0].toUpperCase();
+
+    c.innerHTML = `
+      <div class="profile-hero">
+        <div class="profile-row">
+          <div class="avatar-lg" style="background:${u.avatarColor||'#5b8cff'};width:96px;height:96px;font-size:36px">${esc(initial)}</div>
+          <div style="flex:1;min-width:240px">
+            <div style="font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.4px">${esc(u.name)}</div>
+            <div style="color:var(--accent);font-size:13px;margin-top:2px">${esc(u.title||'')} ${u.title&&u.department?'·':''} ${esc(u.department||'')}</div>
+            ${u.bio?`<div style="color:var(--text2);font-size:13px;margin-top:.6rem;max-width:600px">${esc(u.bio)}</div>`:''}
+            <div class="profile-meta">
+              ${u.location?`<span>📍 ${esc(u.location)}</span>`:''}
+              <span>📧 ${esc(u.email)}</span>
+              ${u.phone?`<span>📞 ${esc(u.phone)}</span>`:''}
+              ${u.website?`<span>🔗 <a href="${esc(u.website)}" target="_blank" style="color:var(--accent);text-decoration:none">${esc(u.website)}</a></span>`:''}
+              <span>📅 Joined ${fmtDate(u.createdAt)}</span>
+            </div>
+            ${(u.skills||[]).length ? `<div style="margin-top:.75rem">${u.skills.map(sk=>`<span class="skill-pill">${esc(sk)}</span>`).join('')}</div>` : ''}
+          </div>
+          ${isMe?`<button class="btn btn-primary btn-sm" onclick="openOv('ov-edit-profile')">✏️ Edit Profile</button>`:''}
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value">${s.totalProjects}</div><div class="stat-label">Total Projects</div><span class="stat-icon">📁</span></div>
+        <div class="stat-card"><div class="stat-value">${s.publicProjects}</div><div class="stat-label">Public</div><span class="stat-icon">🌍</span></div>
+        <div class="stat-card"><div class="stat-value">${s.privateProjects}</div><div class="stat-label">Private</div><span class="stat-icon">🔒</span></div>
+        <div class="stat-card"><div class="stat-value">${s.totalVersions}</div><div class="stat-label">Versions</div><span class="stat-icon">🔄</span></div>
+        <div class="stat-card"><div class="stat-value">${s.totalStars}</div><div class="stat-label">Stars Earned</div><span class="stat-icon">★</span></div>
+      </div>
+
+      <div class="page-hdr" style="margin-bottom:.5rem"><div><h2 style="font-size:18px">Public Projects</h2></div></div>
+      <div class="doc-grid" id="profile-projects-grid"></div>
+    `;
+    if (recent.length) {
+      document.getElementById('profile-projects-grid').innerHTML = recent.map(p => {
+        const full = ALL_DOCS.find(x => x._id === p._id);
+        return full ? renderCard(full) : `<div class="doc-card" onclick="openDoc('${p._id}')">
+          <div class="dc-top"><div class="dc-icon" style="background:${(CAT_COLORS[p.category]||'#6b7280')}1f;color:${CAT_COLORS[p.category]||'#6b7280'}">📁</div>
+            <div><div class="dc-title">${esc(p.title)}</div><div class="dc-owner">v${p.versionCount}</div></div></div>
+          ${p.description?`<div class="dc-desc">${esc(p.description)}</div>`:''}
+        </div>`;
+      }).join('');
+    } else {
+      document.getElementById('profile-projects-grid').innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">📭</div><h3>No public projects yet</h3></div>';
+    }
+  } catch(e) { c.innerHTML = `<div class="empty-state"><div class="es-icon">❌</div><h3>${esc(e.message)}</h3></div>`; }
+}
+
+// ═══════════════════ EDIT PROFILE ═══════════════════
+let _editSkills = [];
+function openEditProfile() {
+  document.getElementById('prof-name').value     = ME.name || '';
+  document.getElementById('prof-title').value    = ME.title || '';
+  document.getElementById('prof-dept').value     = ME.department || '';
+  document.getElementById('prof-location').value = ME.location || '';
+  document.getElementById('prof-phone').value    = ME.phone || '';
+  document.getElementById('prof-website').value  = ME.website || '';
+  document.getElementById('prof-bio').value      = ME.bio || '';
+  _editSkills = [...(ME.skills || [])];
+  renderEditSkills();
+  renderColorPicker(ME.avatarColor || '#5b8cff');
+  updateAvatarPrev();
+  document.getElementById('dd-menu').classList.remove('show');
+}
+
+function updateAvatarPrev() {
+  const a = document.getElementById('prof-avatar-prev');
+  a.textContent = ((document.getElementById('prof-name').value || ME.name || 'U')[0]||'U').toUpperCase();
+  a.style.background = window._editColor || ME.avatarColor || '#5b8cff';
+}
+
+function renderColorPicker(active) {
+  window._editColor = active;
+  document.getElementById('prof-color-picker').innerHTML = AVATAR_COLORS.map(c =>
+    `<div class="color-swatch ${c===active?'active':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`
+  ).join('');
+  updateAvatarPrev();
+}
+function pickColor(c) {
+  window._editColor = c;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  event.target.classList.add('active');
+  updateAvatarPrev();
+}
+
+function renderEditSkills() {
+  document.getElementById('prof-skills-display').innerHTML = _editSkills.map((s, i) =>
+    `<span class="skill-pill">${esc(s)}<button onclick="removeSkill(${i})">✕</button></span>`
+  ).join('');
+}
+function addSkill(v) {
+  v = String(v||'').trim();
+  if (!v || _editSkills.length >= 12) return;
+  if (!_editSkills.includes(v)) { _editSkills.push(v); renderEditSkills(); }
+}
+function removeSkill(i) { _editSkills.splice(i,1); renderEditSkills(); }
+
+document.addEventListener('input', e => { if (e.target.id === 'prof-name') updateAvatarPrev(); });
+
+async function saveProfile() {
+  try {
+    const d = await http('PUT', '/auth/profile', {
+      name:        document.getElementById('prof-name').value,
+      title:       document.getElementById('prof-title').value,
+      department:  document.getElementById('prof-dept').value,
+      location:    document.getElementById('prof-location').value,
+      phone:       document.getElementById('prof-phone').value,
+      website:     document.getElementById('prof-website').value,
+      bio:         document.getElementById('prof-bio').value,
+      skills:      _editSkills,
+      avatarColor: window._editColor || ME.avatarColor
+    });
+    ME = d.user; localStorage.setItem('nv_user', JSON.stringify(ME));
+    document.getElementById('avatar-btn').textContent = (ME.name||'U')[0].toUpperCase();
+    document.getElementById('avatar-btn').style.background = ME.avatarColor;
+    document.getElementById('dd-name').textContent = ME.name;
+    closeOv('ov-edit-profile');
+    toast('Profile updated','success');
+    if (document.getElementById('view-profile').classList.contains('active')) renderProfile(ME._id);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function changePassword() {
+  try {
+    await http('PUT', '/auth/password', {
+      currentPassword: document.getElementById('cp-cur').value,
+      newPassword:     document.getElementById('cp-new').value
+    });
+    closeOv('ov-change-pass');
+    document.getElementById('cp-cur').value = '';
+    document.getElementById('cp-new').value = '';
+    toast('Password changed','success');
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════ UTILS ═══════════════════
+function esc(str) {
+  return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function parseCsvTable(csv) {
+  const rows = csv.trim().split('\n').map(r => {
+    const cols=[]; let cur='',inQ=false;
+    for(let i=0;i<r.length;i++){
+      if(r[i]==='"'){inQ=!inQ;continue;}
+      if(r[i]===','&&!inQ){cols.push(cur.trim());cur='';continue;}
+      cur+=r[i];
+    }
+    cols.push(cur.trim()); return cols;
+  });
+  if(!rows.length) return '';
+  const hdr = rows[0].map(h=>`<th style="background:var(--bg4);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;position:sticky;top:0;white-space:nowrap">${esc(h)}</th>`).join('');
+  const bdy = rows.slice(1).map(r=>`<tr>${r.map(c=>`<td style="padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px;font-family:var(--mono)">${esc(c)}</td>`).join('')}</tr>`).join('');
+  return `<table style="width:100%;border-collapse:collapse;font-family:var(--mono)"><thead><tr>${hdr}</tr></thead><tbody>${bdy}</tbody></table>`;
+}
+
+// ═══════════════════ INIT ═══════════════════
+(function init() {
+  if (TOKEN && ME) bootApp();
+  else document.getElementById('auth-page').classList.add('show');
+
+  document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  document.getElementById('r-pass').addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
+})();
+</script>
+</body>
+</html>
