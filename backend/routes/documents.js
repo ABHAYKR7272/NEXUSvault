@@ -6,6 +6,7 @@ const Diff     = require('diff');
 const Document = require('../models/Document');
 const { protect } = require('../middleware/auth');
 const upload   = require('../middleware/upload');
+const { cloudinary, uploadBufferToCloudinary } = require('../middleware/upload');
 
 
 const https = require('https');
@@ -18,15 +19,20 @@ function downloadToTemp(url) {
     const lib = url.startsWith('https') ? https : http;
     const tmp = path.join(os.tmpdir(), crypto.randomBytes(8).toString('hex'));
     const ws = fs.createWriteStream(tmp);
-    lib.get(url, (res) => {
+    const req = lib.get(url, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        ws.close(); fs.unlinkSync(tmp);
-        return downloadToTemp(res.headers.location).then(resolve, reject);
+        ws.close(() => { try { fs.unlinkSync(tmp); } catch {} });
+        return downloadToTemp(new URL(res.headers.location, url).toString()).then(resolve, reject);
       }
-      if (res.statusCode !== 200) { ws.close(); return reject(new Error('Download failed '+res.statusCode)); }
+      if (res.statusCode !== 200) {
+        ws.close(() => { try { fs.unlinkSync(tmp); } catch {} });
+        res.resume();
+        return reject(new Error('Download failed '+res.statusCode));
+      }
       res.pipe(ws);
       ws.on('finish', () => ws.close(() => resolve(tmp)));
-    }).on('error', reject);
+    });
+    req.on('error', (err) => { ws.close(() => { try { fs.unlinkSync(tmp); } catch {} }); reject(err); });
   });
 }
 
@@ -50,10 +56,29 @@ router.use(protect);
 
 const TEXT_EXTS = /\.(txt|md|json|html|htm|js|jsx|ts|tsx|py|java|css|xml|yaml|yml|csv|log|sh|rb|go|rs|cpp|c|h|php|sql|env|gitignore|editorconfig|babelrc|eslintrc)$/i;
 
-function processFile(file) {
-  // With Cloudinary storage, file.path is the secure URL
-  const filePath = file.path; // full https URL
-  return { content: '', filePath, fileName: file.originalname, fileSize: file.size, mimeType: file.mimetype, isProject: false };
+async function processFile(file) {
+  const uploaded = await uploadBufferToCloudinary(file);
+  return {
+    content: '',
+    filePath: uploaded.secure_url,
+    fileName: file.originalname,
+    fileSize: file.size,
+    mimeType: file.mimetype,
+    isProject: false
+  };
+}
+
+async function uploadZipVersionData(file) {
+  const uploaded = await uploadBufferToCloudinary(file);
+  return {
+    isProject: true,
+    projectTree: buildTreeFromZipBuffer(file.buffer),
+    fileName: file.originalname,
+    fileSize: file.size,
+    filePath: uploaded.secure_url,
+    mimeType: 'application/zip',
+    content: ''
+  };
 }
 
 async function buildTreeFromZipUrl(zipUrl) {
@@ -61,8 +86,15 @@ async function buildTreeFromZipUrl(zipUrl) {
   try { return buildTreeFromZipSync(zipPath); } finally { try { fs.unlinkSync(zipPath); } catch {} }
 }
 
+function buildTreeFromZipBuffer(buffer) {
+  return buildTreeFromZip(new AdmZip(buffer));
+}
+
 function buildTreeFromZipSync(zipPath) {
-  const zip = new AdmZip(zipPath);
+  return buildTreeFromZip(new AdmZip(zipPath));
+}
+
+function buildTreeFromZip(zip) {
   const entries = zip.getEntries();
   const root = [];
   const dirs = {};
@@ -115,6 +147,31 @@ function canEdit(doc, user) {
   if (isHead(doc, user)) return true;
   const m = getMember(doc, user);
   return !!m && !m.isBlocked && m.role === 'editor';
+}
+
+
+function getCloudinaryPublicId(fileUrl) {
+  try {
+    const u = new URL(fileUrl);
+    const marker = '/raw/upload/';
+    const idx = u.pathname.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(u.pathname.slice(idx + marker.length).replace(/^v\d+\//, ''));
+  } catch {
+    return null;
+  }
+}
+
+function getCloudinaryDeliveryUrl(fileUrl, fileName, asAttachment = false) {
+  const publicId = getCloudinaryPublicId(fileUrl);
+  if (!publicId) return fileUrl;
+  return cloudinary.url(publicId, {
+    resource_type: 'raw',
+    type: 'upload',
+    secure: true,
+    sign_url: true,
+    flags: asAttachment ? `attachment:${fileName || 'download'}` : undefined,
+  });
 }
 
 // ── GET /api/documents/stats/overview ────────────────────────────────────
@@ -230,14 +287,9 @@ router.post('/', upload.single('file'), async (req, res) => {
       const ext = path.extname(req.file.originalname).toLowerCase();
 
       if (ext === '.zip') {
-        versionData.isProject   = true;
-        versionData.projectTree = await buildTreeFromZipUrl(req.file.path);
-        versionData.fileName    = req.file.originalname;
-        versionData.fileSize    = req.file.size;
-        versionData.filePath    = req.file.path;
-        versionData.mimeType    = 'application/zip';
+        Object.assign(versionData, await uploadZipVersionData(req.file));
       } else {
-        Object.assign(versionData, processFile(req.file));
+        Object.assign(versionData, await processFile(req.file));
       }
     } else if (req.body.content) {
       versionData.content = req.body.content;
@@ -523,15 +575,10 @@ router.post('/:id/versions', upload.single('file'), async (req, res) => {
     if (req.file) {
       const ext = path.extname(req.file.originalname).toLowerCase();
       if (ext === '.zip') {
-        versionData.isProject   = true;
-        versionData.projectTree = await buildTreeFromZipUrl(req.file.path);
-        versionData.fileName    = req.file.originalname;
-        versionData.fileSize    = req.file.size;
-        versionData.filePath    = req.file.path;
-        versionData.mimeType    = 'application/zip';
+        Object.assign(versionData, await uploadZipVersionData(req.file));
         versionData.content     = '';
       } else {
-        const p = processFile(req.file);
+        const p = await processFile(req.file);
         Object.assign(versionData, p);
         versionData.isProject   = false;
         versionData.projectTree = [];
@@ -726,6 +773,9 @@ router.get('/:id/versions/:ver/download', async (req, res) => {
 
     if (version.filePath) {
       const fp = version.filePath;
+      if (/^https?:\/\//i.test(fp)) {
+        return res.redirect(getCloudinaryDeliveryUrl(fp, version.fileName || 'download', true));
+      }
       if (fs.existsSync(fp)) {
         res.setHeader('Content-Disposition', `attachment; filename="${version.fileName || 'download'}"`);
         return res.sendFile(fp);
@@ -747,6 +797,9 @@ router.get('/:id/versions/:ver/preview', async (req, res) => {
 
     if (version.filePath) {
       const fp = version.filePath;
+      if (/^https?:\/\//i.test(fp)) {
+        return res.redirect(getCloudinaryDeliveryUrl(fp, version.fileName || 'preview', false));
+      }
       if (fs.existsSync(fp)) {
         res.setHeader('Content-Type', version.mimeType || 'application/octet-stream');
         return res.sendFile(fp);
