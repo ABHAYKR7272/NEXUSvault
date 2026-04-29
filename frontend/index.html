@@ -1101,7 +1101,7 @@ html,body{
    <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0;min-height:36px" onchange="loadVersion(this.value)"></select>
    <button class="btn btn-ghost btn-sm" id="btn-diff" onclick="openDiff()">↔ Compare</button>
    <button class="btn btn-ghost btn-sm" id="btn-new-ver" onclick="openNewVersion()">🔄 New Version</button>
-   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" target="_blank">⬇ Download</a>
+   <a ... id="det-dl-btn" href="#" onclick="handleDownload(event)">⬇ Download</a>
    <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Del Version</button>
   </div>
 
@@ -1735,8 +1735,8 @@ function loadVersion(vNum) {
 
   const dlUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/download`;
   const prvUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/preview`;
-  document.getElementById('det-dl-btn').href = dlUrl;
-  document.getElementById('det-dl-btn').download = CUR_VER.fileName || 'download';
+  dlBtn.dataset.href = dlUrl;
+  dlBtn.dataset.filename = CUR_VER.fileName || 'download';
 
   document.getElementById('det-ver-info').innerHTML = `
     <span style="color:var(--accent);font-weight:600;font-family:var(--display)">v${CUR_VER.versionNumber}</span> ·
