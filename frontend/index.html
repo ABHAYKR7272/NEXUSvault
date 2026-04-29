@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#080a0e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEXUSvault — Project & Document Management</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -22,43 +19,13 @@
   --r:10px; --r2:14px; --mono:'DM Mono',monospace;
   --sans:'DM Sans',sans-serif; --display:'Syne',sans-serif;
   --shadow:0 8px 32px #00000066; --shadow2:0 2px 12px #0000004d;
-
-  /* Safe area insets for notch/camera/home indicator */
-  --sat: env(safe-area-inset-top, 0px);
-  --sar: env(safe-area-inset-right, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sal: env(safe-area-inset-left, 0px);
-
-  /* Sidebar width */
-  --sidebar-w: 230px;
-  /* Topbar height */
-  --topbar-h: 58px;
-  /* Mobile bottom nav height */
-  --bnav-h: 0px;
 }
-
-/* On mobile, account for bottom nav */
-@media (max-width: 767px) {
-  :root { --bnav-h: 62px; }
-}
-
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:99px}
 ::-webkit-scrollbar-thumb:hover{background:var(--border3)}
 
-html,body{
-  height:100%;
-  background:var(--bg0);
-  color:var(--text);
-  font-family:var(--sans);
-  font-size:14px;
-  line-height:1.6;
-  overflow:hidden;
-  /* Prevent text size adjustment on orientation change */
-  -webkit-text-size-adjust:100%;
-  text-size-adjust:100%;
-}
+html,body{height:100%;background:var(--bg0);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overflow:hidden}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -66,7 +33,7 @@ html,body{
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid #ffffff44;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 
-/* ══════════ AUTH ══════════ */
+/* AUTH */
 #auth-page{
   display:none;position:fixed;inset:0;z-index:1000;
   background:var(--bg0);overflow:auto;
@@ -74,21 +41,16 @@ html,body{
     radial-gradient(ellipse 80% 60% at 50% -10%,#5b8cff22,transparent),
     radial-gradient(ellipse 50% 40% at 90% 80%,#a855f718,transparent),
     radial-gradient(ellipse 50% 50% at 10% 90%,#22d3ee10,transparent);
-  /* Account for safe areas */
-  padding-top: var(--sat);
-  padding-left: var(--sal);
-  padding-right: var(--sar);
-  padding-bottom: var(--sab);
 }
 #auth-page.show{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.auth-wrap{width:100%;max-width:440px;padding:2rem 1.25rem;animation:fadeUp .5s ease both}
+.auth-wrap{width:100%;max-width:440px;padding:2rem;animation:fadeUp .5s ease both}
 .auth-logo{text-align:center;margin-bottom:2rem}
 .auth-logo .logo-icon{
   width:64px;height:64px;border-radius:18px;background:var(--accent-g);
   display:inline-flex;align-items:center;justify-content:center;
   font-size:28px;margin-bottom:1rem;box-shadow:0 0 60px #5b8cff55;color:#fff;font-family:var(--display);font-weight:800;
 }
-.auth-logo h1{font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-0.5px}
+.auth-logo h1{font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-0.5px}
 .auth-logo h1 .accent{background:var(--accent-g);-webkit-background-clip:text;background-clip:text;color:transparent}
 .auth-logo p{color:var(--text3);font-size:13px;margin-top:6px}
 
@@ -99,12 +61,10 @@ html,body{
 .auth-tab{
   flex:1;padding:.65rem;text-align:center;border-radius:7px;cursor:pointer;
   font-size:13px;font-weight:600;color:var(--text3);transition:all .2s;font-family:var(--display);
-  /* Minimum touch target */
-  min-height:44px;display:flex;align-items:center;justify-content:center;
 }
 .auth-tab.active{background:var(--bg4);color:var(--text);box-shadow:var(--shadow2)}
 
-.auth-card{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--r2);padding:1.75rem 1.5rem}
+.auth-card{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--r2);padding:1.75rem}
 .auth-form-panel{display:none}
 .auth-form-panel.active{display:block;animation:fadeIn .25s ease both}
 
@@ -112,43 +72,28 @@ html,body{
 .field label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
 .field input,.field select,.field textarea{
   width:100%;background:var(--bg3);border:1px solid var(--border2);
-  border-radius:var(--r);padding:.75rem 1rem;color:var(--text);
-  font-family:var(--sans);font-size:16px;/* 16px prevents iOS zoom */
-  outline:none;transition:border-color .2s;
-  /* Ensure minimum touch target height */
-  min-height:44px;
-  -webkit-appearance:none;appearance:none;
+  border-radius:var(--r);padding:.7rem 1rem;color:var(--text);
+  font-family:var(--sans);font-size:14px;outline:none;transition:border-color .2s;
 }
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
 .field input::placeholder,.field textarea::placeholder{color:var(--text3)}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 .field-help{font-size:11px;color:var(--text3);margin-top:4px}
 
-/* On small screens stack field-row */
-@media (max-width:480px){
-  .field-row{grid-template-columns:1fr}
-  .field input,.field select,.field textarea{font-size:16px}/* keep 16px to prevent zoom */
-}
-
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:.65rem 1.25rem;border-radius:var(--r);border:none;cursor:pointer;
   font-family:var(--display);font-size:13px;font-weight:600;
   transition:all .2s;text-decoration:none;letter-spacing:.2px;
-  /* Touch-friendly minimum size */
-  min-height:44px;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
 }
 .btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 4px 20px #5b8cff33}
-.btn-primary:hover{opacity:.92}
-@media (hover:hover){.btn-primary:hover{transform:translateY(-1px)}}
+.btn-primary:hover{opacity:.92;transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
 .btn-ghost:hover{border-color:var(--border3);color:var(--text)}
 .btn-green{background:var(--green);color:#fff}
 .btn-red{background:var(--red);color:#fff}
 .btn-yellow{background:var(--yellow);color:#000}
-.btn-sm{padding:.45rem .85rem;font-size:12px;min-height:36px}
+.btn-sm{padding:.45rem .85rem;font-size:12px}
 .btn-full{width:100%;margin-top:.5rem}
 .btn-icon{padding:.55rem .75rem}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -159,59 +104,38 @@ html,body{
 
 .auth-footer{text-align:center;margin-top:1.5rem;font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
 
-/* ══════════ MAIN APP ══════════ */
+/* MAIN APP */
 #app{display:none;height:100vh;flex-direction:column}
 #app.show{display:flex}
 
-/* ══════════ TOPBAR ══════════ */
 .topbar{
-  height:calc(var(--topbar-h) + var(--sat));
-  padding-top: var(--sat);
-  padding-left: calc(1.25rem + var(--sal));
-  padding-right: calc(1.25rem + var(--sar));
-  background:var(--bg1);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:.75rem;flex-shrink:0;
+  height:58px;background:var(--bg1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 1.25rem;gap:1rem;flex-shrink:0;
   position:relative;z-index:100;
 }
 .topbar-logo{
   display:flex;align-items:center;gap:10px;font-family:var(--display);
   font-weight:800;font-size:17px;letter-spacing:-.4px;cursor:pointer;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .topbar-logo .tl-icon{
   width:34px;height:34px;border-radius:9px;background:var(--accent-g);
   display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:800;
-  flex-shrink:0;
 }
 .topbar-logo .tl-text .accent{background:var(--accent-g);-webkit-background-clip:text;background-clip:text;color:transparent}
 .topbar-search{flex:1;max-width:420px;position:relative}
 .topbar-search input{
   width:100%;background:var(--bg3);border:1px solid var(--border);
   border-radius:var(--r);padding:.55rem 1rem .55rem 2.5rem;
-  color:var(--text);font-size:14px;outline:none;transition:border-color .2s;
-  min-height:40px;
+  color:var(--text);font-size:13px;outline:none;transition:border-color .2s;
 }
 .topbar-search input:focus{border-color:var(--accent)}
 .topbar-search .srch-ic{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.5rem}
-
-/* Hamburger button - mobile only */
-.hamburger-btn{
-  display:none;
-  width:40px;height:40px;border-radius:9px;
-  background:var(--bg3);border:1px solid var(--border);
-  align-items:center;justify-content:center;cursor:pointer;
-  color:var(--text2);font-size:18px;transition:all .2s;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;flex-shrink:0;
-}
-.hamburger-btn:hover{border-color:var(--border3);color:var(--text)}
-
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:.6rem}
 .topbar-notif{
-  position:relative;width:40px;height:40px;border-radius:9px;
+  position:relative;width:36px;height:36px;border-radius:9px;
   background:var(--bg3);border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   color:var(--text2);font-size:15px;transition:all .2s;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;flex-shrink:0;
 }
 .topbar-notif:hover{border-color:var(--border3);color:var(--text);background:var(--bg4)}
 .notif-badge{
@@ -221,43 +145,26 @@ html,body{
 }
 .notif-badge.show{display:flex}
 .avatar-btn{
-  width:40px;height:40px;border-radius:50%;display:flex;
+  width:36px;height:36px;border-radius:50%;display:flex;
   align-items:center;justify-content:center;cursor:pointer;
   font-size:13px;font-weight:700;color:#fff;font-family:var(--display);
-  border:2px solid transparent;transition:all .2s;flex-shrink:0;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  border:2px solid transparent;transition:all .2s;
 }
 .avatar-btn:hover{border-color:var(--border3)}
 
-/* ══════════ MAIN LAYOUT ══════════ */
-.main-layout{display:flex;flex:1;overflow:hidden;position:relative}
+.main-layout{display:flex;flex:1;overflow:hidden}
 
-/* ══════════ SIDEBAR OVERLAY (mobile) ══════════ */
-.sidebar-overlay{
-  display:none;
-  position:fixed;inset:0;
-  background:#000000aa;
-  z-index:200;
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
-}
-.sidebar-overlay.show{display:block;animation:fadeIn .2s ease both}
-
-/* ══════════ SIDEBAR ══════════ */
 .sidebar{
-  width:var(--sidebar-w);flex-shrink:0;background:var(--bg1);
+  width:230px;flex-shrink:0;background:var(--bg1);
   border-right:1px solid var(--border);display:flex;flex-direction:column;
   padding:.75rem 0;overflow-y:auto;
-  padding-bottom: calc(.75rem + var(--sab));
 }
 .sidebar-section{padding:.25rem .75rem;margin-bottom:.25rem}
 .sidebar-label{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;padding:.5rem .5rem .25rem}
 .sidebar-item{
-  display:flex;align-items:center;gap:.6rem;padding:.65rem .75rem;
+  display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;
   border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;
   font-weight:500;transition:all .15s;position:relative;
-  min-height:44px;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .sidebar-item:hover{background:var(--bg3);color:var(--text)}
 .sidebar-item.active{background:var(--bg4);color:var(--text)}
@@ -272,66 +179,45 @@ html,body{
 .sidebar-foot{margin-top:auto;padding:1rem .75rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3);text-align:center;letter-spacing:.5px}
 .sidebar-foot strong{color:var(--text2);font-family:var(--display)}
 
-/* ══════════ CONTENT ══════════ */
-.content{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column}
 
-.view{
-  display:none;flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:1.5rem;
-  /* Bottom padding accounts for mobile bottom nav + safe area */
-  padding-bottom:calc(1.5rem + var(--bnav-h) + var(--sab));
-}
+.view{display:none;flex:1;overflow:auto;padding:1.5rem}
 .view.active{display:block;animation:fadeIn .25s ease both}
 
-.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:.75rem;flex-wrap:wrap}
-.page-hdr h2{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.4px}
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.page-hdr h2{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:-.4px}
 .page-hdr p{color:var(--text3);font-size:13px;margin-top:2px}
 .hdr-acts{display:flex;gap:.5rem;flex-wrap:wrap}
 
-/* ══════════ STATS ══════════ */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.75rem;margin-bottom:1.75rem}
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.85rem;margin-bottom:1.75rem}
 .stat-card{
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);
-  padding:1rem;position:relative;overflow:hidden;transition:all .2s;
+  padding:1.1rem;position:relative;overflow:hidden;transition:all .2s;
 }
-.stat-card:hover{border-color:var(--border2)}
-@media (hover:hover){.stat-card:hover{transform:translateY(-2px)}}
-.stat-value{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:-.5px}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.stat-value{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.5px}
 .stat-label{font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
-.stat-icon{position:absolute;top:1rem;right:1rem;font-size:18px;opacity:.7}
+.stat-icon{position:absolute;top:1.1rem;right:1.1rem;font-size:18px;opacity:.7}
 
-/* ══════════ FILTER CHIPS ══════════ */
-.filter-bar{
-  display:flex;gap:.5rem;flex-wrap:nowrap;margin-bottom:1.25rem;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;
-  padding-bottom:4px;
-  scrollbar-width:none;
-}
-.filter-bar::-webkit-scrollbar{display:none}
+/* Filter chips */
+.filter-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
 .filter-chip{
-  padding:.45rem .9rem;border-radius:99px;background:var(--bg2);
+  padding:.4rem .85rem;border-radius:99px;background:var(--bg2);
   border:1px solid var(--border);font-size:12px;font-weight:500;
   cursor:pointer;color:var(--text2);transition:all .15s;font-family:var(--display);
-  white-space:nowrap;flex-shrink:0;min-height:36px;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .filter-chip:hover{border-color:var(--border3);color:var(--text)}
 .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* ══════════ PROJECT CARDS ══════════ */
-.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+/* Project cards */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
 .doc-card{
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);
   padding:1.1rem;cursor:pointer;position:relative;transition:all .2s;
   display:flex;flex-direction:column;gap:.6rem;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-.doc-card:hover{border-color:var(--border3);box-shadow:var(--shadow2)}
-@media (hover:hover){.doc-card:hover{transform:translateY(-2px)}}
-
-/* Active state for touch */
-.doc-card:active{transform:scale(0.985);opacity:.9}
-
+.doc-card:hover{border-color:var(--border3);transform:translateY(-2px);box-shadow:var(--shadow2)}
 .dc-vis{
   position:absolute;top:.75rem;right:.75rem;font-size:10px;font-weight:600;
   padding:2px 8px;border-radius:99px;letter-spacing:.3px;font-family:var(--display);
@@ -358,64 +244,19 @@ html,body{
 .dc-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text3);padding-top:.4rem;border-top:1px solid var(--border);margin-top:auto;flex-wrap:wrap;gap:.4rem}
 .dc-stat{display:inline-flex;align-items:center;gap:3px}
 
-/* ══════════ MOBILE BOTTOM NAV ══════════ */
-.bottom-nav{
-  display:none;
-  position:fixed;
-  bottom:0;left:0;right:0;
-  height:calc(var(--bnav-h) + var(--sab));
-  background:var(--bg1);
-  border-top:1px solid var(--border2);
-  z-index:150;
-  padding-bottom:var(--sab);
-  padding-left:var(--sal);
-  padding-right:var(--sar);
-}
-.bnav-items{
-  display:flex;height:var(--bnav-h);
-}
-.bnav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;cursor:pointer;
-  color:var(--text3);font-size:10px;font-weight:600;
-  font-family:var(--display);letter-spacing:.3px;
-  transition:color .15s;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
-  min-height:44px;
-}
-.bnav-item .bnav-ic{font-size:20px;line-height:1;transition:transform .15s}
-.bnav-item.active{color:var(--accent)}
-.bnav-item.active .bnav-ic{transform:translateY(-2px)}
-.bnav-item:active .bnav-ic{transform:scale(.85)}
-
-/* ══════════ MODALS ══════════ */
-.ov{
-  display:none;position:fixed;inset:0;background:#000000bb;z-index:500;
-  align-items:flex-start;justify-content:center;overflow-y:auto;
-  padding:1.5rem 1rem;
-  /* Safe areas */
-  padding-top: max(1.5rem, var(--sat));
-  padding-left: max(1rem, var(--sal));
-  padding-right: max(1rem, var(--sar));
-  padding-bottom: max(1.5rem, var(--sab));
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-}
+/* Modal */
+.ov{display:none;position:fixed;inset:0;background:#000000bb;z-index:500;align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem;backdrop-filter:blur(4px)}
 .ov.show{display:flex;animation:fadeIn .15s ease both}
-
 .modal{
   width:100%;max-width:520px;background:var(--bg1);border:1px solid var(--border2);
-  border-radius:var(--r2);padding:1.75rem 1.5rem;position:relative;animation:fadeUp .25s ease both;
-  /* Prevent modal from touching screen edges on very small screens */
-  margin:auto;
+  border-radius:var(--r2);padding:1.75rem;position:relative;animation:fadeUp .25s ease both;
 }
 .modal-lg{max-width:720px}
 .modal-xl{max-width:1100px}
 .m-close{
-  position:absolute;top:.75rem;right:.75rem;width:36px;height:36px;border-radius:8px;
+  position:absolute;top:.75rem;right:.75rem;width:32px;height:32px;border-radius:8px;
   background:var(--bg3);border:none;color:var(--text2);cursor:pointer;font-size:14px;
   display:flex;align-items:center;justify-content:center;transition:all .15s;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .m-close:hover{background:var(--bg4);color:var(--text)}
 .m-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.3px;padding-right:2rem}
@@ -423,12 +264,11 @@ html,body{
 .m-divider{height:1px;background:var(--border);margin:1.25rem 0}
 .m-acts{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap}
 
-/* ══════════ VISIBILITY SELECTOR ══════════ */
+/* Visibility selector */
 .vis-select{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem}
 .vis-opt{
   padding:.85rem;border-radius:var(--r);background:var(--bg3);
   border:2px solid var(--border);cursor:pointer;transition:all .15s;position:relative;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .vis-opt:hover{border-color:var(--border3)}
 .vis-opt.selected{border-color:var(--accent);background:#5b8cff10}
@@ -440,9 +280,9 @@ html,body{
 .vis-opt.selected .vis-check{display:flex}
 .vis-opt.private.selected .vis-check{background:var(--purple)}
 
-/* ══════════ UPLOAD ZONE ══════════ */
+/* Upload zone */
 .upload-zone{
-  border:2px dashed var(--border2);border-radius:var(--r);padding:2rem 1rem;text-align:center;
+  border:2px dashed var(--border2);border-radius:var(--r);padding:2rem;text-align:center;
   cursor:pointer;transition:all .15s;position:relative;background:var(--bg3);
 }
 .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:#5b8cff08}
@@ -454,16 +294,16 @@ html,body{
 .up-icon{font-size:24px}
 .up-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .up-size{font-size:11px;color:var(--text3);font-family:var(--mono)}
-.up-clear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+.up-clear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px}
 
-/* ══════════ CODE DISPLAY ══════════ */
-.code-display{display:flex;justify-content:center;gap:.4rem;margin:1rem 0;flex-wrap:wrap}
+/* Code display */
+.code-display{display:flex;justify-content:center;gap:.4rem;margin:1rem 0}
 .code-digit{
   width:42px;height:52px;background:var(--bg3);border:1px solid var(--border2);
   border-radius:var(--r);display:flex;align-items:center;justify-content:center;
   font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);
 }
-.code-input{display:flex;justify-content:center;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.code-input{display:flex;justify-content:center;gap:.4rem;margin-top:.5rem}
 .code-input input{
   width:42px;height:52px;text-align:center;background:var(--bg3);
   border:1px solid var(--border2);border-radius:var(--r);
@@ -471,7 +311,7 @@ html,body{
 }
 .code-input input:focus{border-color:var(--accent)}
 
-/* ══════════ EMPTY/LOADING ══════════ */
+/* Empty/loading */
 .empty-state,.loading-state{
   text-align:center;padding:3rem 1rem;color:var(--text3);
 }
@@ -479,13 +319,13 @@ html,body{
 .empty-state h3{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text2);margin-bottom:.25rem}
 .empty-state p{font-size:13px}
 
-/* ══════════ FILE VIEWER ══════════ */
-.file-viewer{display:flex;height:400px;background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.fv-tree{width:200px;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg1);padding:.5rem 0}
-.fv-content{flex:1;overflow:auto;background:var(--bg0);min-width:0}
+/* File viewer */
+.file-viewer{display:flex;height:460px;background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.fv-tree{width:240px;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg1);padding:.5rem 0}
+.fv-content{flex:1;overflow:auto;background:var(--bg0)}
 .fv-content pre{padding:1rem;font-family:var(--mono);font-size:12px;color:var(--text2);white-space:pre;line-height:1.6}
 .fv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:6px}
-.tree-row{display:flex;align-items:center;gap:.4rem;padding:.35rem .6rem;cursor:pointer;font-size:12px;color:var(--text2);border-radius:5px;margin:1px .5rem;min-height:36px}
+.tree-row{display:flex;align-items:center;gap:.4rem;padding:.3rem .6rem;cursor:pointer;font-size:12px;color:var(--text2);border-radius:5px;margin:1px .5rem}
 .tree-row:hover{background:var(--bg3);color:var(--text)}
 .tree-row.selected{background:var(--accent);color:#fff}
 .tree-toggle{font-size:9px;color:var(--text3);transition:transform .15s;display:inline-block;width:12px}
@@ -494,8 +334,8 @@ html,body{
 .tr-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)}
 .tree-children{margin-left:0}
 
-/* ══════════ DIFF VIEWER ══════════ */
-.diff-view{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg0);max-height:400px;overflow-y:auto}
+/* Diff viewer */
+.diff-view{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg0);max-height:460px;overflow-y:auto}
 .diff-header{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);font-family:var(--mono);font-size:11px;color:var(--text3)}
 .diff-header-col{padding:.5rem .85rem;border-right:1px solid var(--border)}
 .diff-body{display:grid;grid-template-columns:1fr 1fr}
@@ -504,12 +344,11 @@ html,body{
 .diff-line.add{background:#22c55e15;color:#86efac}
 .diff-line.rem{background:#ef444415;color:#fca5a5}
 .diff-line.same{color:var(--text3)}
-
-/* ══════════ TREE COMPARE ══════════ */
+/* ── Tree compare ─────────────────────────────── */
 .tcmp-wrap{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg0)}
 .tcmp-head{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);font-family:var(--mono);font-size:11px;color:var(--text3)}
 .tcmp-head>div{padding:.5rem .85rem;border-right:1px solid var(--border)}
-.tcmp-body{display:grid;grid-template-columns:1fr 1fr;max-height:340px;overflow:auto}
+.tcmp-body{display:grid;grid-template-columns:1fr 1fr;max-height:380px;overflow:auto}
 .tcmp-col{padding:.4rem 0;font-family:var(--mono);font-size:12px;border-right:1px solid var(--border)}
 .tnode{padding:2px 6px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;border-left:3px solid transparent}
 .tnode:hover{background:var(--bg2)}
@@ -530,7 +369,7 @@ html,body{
 .tcmp-stats{display:flex;gap:.85rem;font-size:12px;margin-bottom:.5rem;flex-wrap:wrap}
 .tcmp-stats .pill{padding:2px 8px;border-radius:99px;background:var(--bg3);border:1px solid var(--border)}
 
-/* ══════════ MEMBER TABLE ══════════ */
+/* Member table */
 .member-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg2);border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
 .member-table th{background:var(--bg4);padding:.6rem .85rem;text-align:left;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.4px;text-transform:uppercase}
 .member-table td{padding:.7rem .85rem;border-top:1px solid var(--border);color:var(--text2);vertical-align:middle}
@@ -541,17 +380,8 @@ html,body{
 .role-badge.viewer{background:#22c55e20;color:var(--green)}
 .role-badge.blocked{background:#ef444420;color:var(--red)}
 
-/* Member table scroll on mobile */
-.member-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-/* ══════════ TOASTS ══════════ */
-#toast-container{
-  position:fixed;
-  bottom:calc(1.5rem + var(--bnav-h) + var(--sab));
-  right:calc(1.5rem + var(--sar));
-  z-index:9999;display:flex;flex-direction:column;gap:.5rem;
-  max-width:calc(100vw - 3rem);
-}
+/* Toasts */
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
 .toast{
   background:var(--bg2);border:1px solid var(--border2);border-left:3px solid var(--accent);
   border-radius:var(--r);padding:.75rem 1rem;font-size:13px;color:var(--text);
@@ -562,7 +392,7 @@ html,body{
 .toast.error{border-left-color:var(--red)}
 .toast.warn{border-left-color:var(--yellow)}
 
-/* ══════════ DROPDOWN ══════════ */
+/* Dropdown */
 .dropdown{position:relative}
 .dropdown-menu{
   position:absolute;top:calc(100% + 6px);right:0;min-width:200px;
@@ -571,19 +401,18 @@ html,body{
 }
 .dropdown-menu.show{display:block;animation:fadeUp .15s ease both}
 .dd-item{
-  padding:.6rem .75rem;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);
+  padding:.55rem .75rem;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);
   display:flex;align-items:center;gap:.5rem;transition:all .12s;
-  min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 .dd-item:hover{background:var(--bg4);color:var(--text)}
 .dd-item.danger{color:var(--red)}
 .dd-divider{height:1px;background:var(--border);margin:.25rem 0}
 .dd-header{padding:.5rem .75rem;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-family:var(--display);font-weight:600}
 
-/* ══════════ AVATAR ══════════ */
+/* Avatar large */
 .avatar-lg{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;font-family:var(--display)}
 .color-picker{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
-.color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;touch-action:manipulation;}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .color-swatch:hover{transform:scale(1.1)}
 .color-swatch.active{border-color:#fff;box-shadow:0 0 0 2px var(--bg1)}
 
@@ -592,16 +421,16 @@ html,body{
   background:var(--bg3);border:1px solid var(--border2);border-radius:99px;
   font-size:11px;color:var(--text2);margin:2px;font-family:var(--mono);
 }
-.skill-pill button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;line-height:1;padding:0;min-width:20px;min-height:20px;display:flex;align-items:center;justify-content:center}
+.skill-pill button{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;line-height:1;padding:0}
 .skill-pill button:hover{color:var(--red)}
 
 .prog-bar{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:.5rem}
 .prog-fill{height:100%;background:var(--accent-g);border-radius:3px;transition:width .3s}
 
-/* ══════════ PROFILE ══════════ */
+/* Profile view */
 .profile-hero{
   background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);
-  border-radius:var(--r2);padding:1.75rem 1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden;
+  border-radius:var(--r2);padding:1.75rem;margin-bottom:1.25rem;position:relative;overflow:hidden;
 }
 .profile-hero::before{
   content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,#5b8cff15,transparent 60%);pointer-events:none;
@@ -610,160 +439,16 @@ html,body{
 .profile-meta{display:flex;flex-wrap:wrap;gap:.4rem .9rem;font-size:12px;color:var(--text3);margin-top:.4rem}
 .profile-meta span{display:inline-flex;align-items:center;gap:4px}
 
+/* Section heading */
 .sh{font-family:var(--display);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.6rem}
 
-
-/* ══════════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-   ══════════════════════════════════════════════ */
-
-/* ── Tablet (768px – 1024px) ── */
-@media (max-width:1024px) {
-  :root { --sidebar-w: 200px; }
-  .doc-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-  .stats-row{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
-  .modal-xl{max-width:95vw}
-}
-
-/* ── Mobile (≤767px) — hamburger layout ── */
-@media (max-width:767px) {
-  :root { --sidebar-w: 260px; }
-
-  .hamburger-btn{display:flex}
-
-  /* Hide the search bar label on very small widths, keep functional */
-  .topbar-logo .tl-text{display:block}
-
-  /* Sidebar slides in from the left as a drawer */
-  .sidebar{
-    position:fixed;
-    top:0;left:0;
-    height:100%;
-    padding-top: calc(.75rem + var(--sat));
-    transform:translateX(-100%);
-    transition:transform .25s cubic-bezier(.4,0,.2,1);
-    z-index:300;
-    box-shadow:var(--shadow);
-  }
-  .sidebar.open{transform:translateX(0)}
-  .sidebar-overlay{display:none}
-  .sidebar-overlay.show{display:block}
-
-  /* No sidebar space in main layout on mobile */
-  .main-layout{flex-direction:column}
-
-  /* Bottom nav visible on mobile */
-  .bottom-nav{display:block}
-
-  .view{padding:1rem;padding-bottom:calc(1rem + var(--bnav-h) + var(--sab))}
-
-  .page-hdr h2{font-size:20px}
-
-  /* Full-screen modals on mobile */
-  .ov{
-    padding:0;
-    align-items:flex-end;
-  }
-  .modal,.modal-lg,.modal-xl{
-    max-width:100%;
-    width:100%;
-    border-radius:var(--r2) var(--r2) 0 0;
-    border-bottom:none;
-    max-height:92vh;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    padding:1.5rem 1.25rem;
-    padding-bottom: calc(1.5rem + var(--sab));
-    margin:0;
-    animation:slideUp .25s ease both;
-  }
-  @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
-
-  /* Drag handle hint for bottom sheets */
-  .modal::before{
-    content:'';display:block;width:48px;height:4px;
-    background:var(--border3);border-radius:99px;
-    margin:0 auto .75rem;
-  }
-
-  /* Member table horizontal scroll on mobile */
-  .member-table-wrap{margin:0 -1.25rem;padding:0 1.25rem}
-
-  /* File viewer reduced height on mobile */
-  .file-viewer{height:320px;flex-direction:column}
-  .fv-tree{width:100%;height:120px;border-right:none;border-bottom:1px solid var(--border)}
-
-  /* Diff view horizontal scroll */
-  .diff-view{overflow-x:auto}
-  .diff-body,.diff-header{min-width:600px}
-  .tcmp-body,.tcmp-head{min-width:500px}
-
-  /* Version details stacked */
-  #ov-detail .modal>div[style*="display:flex;align-items:flex-start;gap:1rem"]{
-    flex-direction:column;
-  }
-
-  /* Stats row - 2 columns on mobile */
-  .stats-row{grid-template-columns:1fr 1fr;gap:.6rem}
-  .stat-value{font-size:22px}
-
-  /* Doc grid - single column on small mobile */
-  .doc-grid{grid-template-columns:1fr}
-
-  /* Diff version selects stacked */
-  #ov-diff [style*="grid-template-columns:1fr auto 1fr"]{
-    grid-template-columns:1fr !important;
-  }
-}
-
-/* ── Small mobile (≤380px) ── */
-@media (max-width:380px){
-  .topbar-logo .tl-text{display:none}
-  .topbar-search{max-width:none}
-  .doc-grid{grid-template-columns:1fr}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .code-digit,.code-input input{width:36px;height:46px;font-size:18px}
-  .auth-card{padding:1.25rem 1rem}
-  .auth-wrap{padding:1.5rem 1rem}
-}
-
-/* ── Large screens (≥1280px) ── */
-@media (min-width:1280px){
-  .doc-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
-  .stats-row{grid-template-columns:repeat(5,1fr)}
-}
-
-/* ══════════════════════════════════════════════
-   LANDSCAPE PHONE — prevent issues with tall modals
-   ══════════════════════════════════════════════ */
-@media (max-width:767px) and (orientation:landscape){
-  :root { --bnav-h: 54px; }
-  .modal,.modal-lg,.modal-xl{
-    max-height:85vh;
-    border-radius:var(--r2);
-    margin:auto;
-    width:calc(100% - 2rem);
-  }
-  .ov{align-items:center;padding:.5rem}
-  .file-viewer{height:240px}
-}
-
-/* ══════════════════════════════════════════════
-   HIGH-DPI / RETINA — sharper borders
-   ══════════════════════════════════════════════ */
-@media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
-  .topbar,.sidebar,.bottom-nav{
-    /* Use 0.5px borders on retina where supported */
-    border-width:0.5px;
-  }
-}
 </style>
 </head>
 <body>
 
 <div id="toast-container"></div>
 
-<!-- ══════════════════ AUTH PAGE ══════════════════ -->
+<!-- ═══════════════════ AUTH PAGE ═══════════════════ -->
 <div id="auth-page">
  <div class="auth-wrap">
   <div class="auth-logo">
@@ -782,7 +467,7 @@ html,body{
    <div class="auth-form-panel active" id="panel-login">
     <div class="field">
      <label>Email Address</label>
-     <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+     <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
     </div>
     <div class="field">
      <label>Password</label>
@@ -794,12 +479,12 @@ html,body{
    <!-- REGISTER -->
    <div class="auth-form-panel" id="panel-register">
     <div class="field-row">
-     <div class="field"><label>Full Name *</label><input type="text" id="r-name" placeholder="Your name" autocomplete="name"></div>
+     <div class="field"><label>Full Name *</label><input type="text" id="r-name" placeholder="Your name"></div>
      <div class="field"><label>Title</label><input type="text" id="r-title" placeholder="e.g. Engineer"></div>
     </div>
     <div class="field"><label>Department</label><input type="text" id="r-dept" placeholder="e.g. Engineering"></div>
-    <div class="field"><label>Email Address *</label><input type="email" id="r-email" placeholder="you@example.com" autocomplete="email" inputmode="email"></div>
-    <div class="field"><label>Password *</label><input type="password" id="r-pass" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+    <div class="field"><label>Email Address *</label><input type="email" id="r-email" placeholder="you@example.com"></div>
+    <div class="field"><label>Password *</label><input type="password" id="r-pass" placeholder="Min. 6 characters"></div>
     <button class="btn btn-primary btn-full" id="btn-register" onclick="doRegister()">Create Account →</button>
    </div>
   </div>
@@ -811,21 +496,17 @@ html,body{
  </div>
 </div>
 
-<!-- ══════════════════ MAIN APP ══════════════════ -->
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
 <div id="app">
 
- <!-- TOPBAR -->
  <div class="topbar">
-  <!-- Hamburger (mobile only) -->
-  <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
-
   <div class="topbar-logo" onclick="showView('home')">
    <div class="tl-icon">N</div>
    <span class="tl-text">NEXUS<span class="accent">vault</span></span>
   </div>
   <div class="topbar-search">
    <span class="srch-ic">🔍</span>
-   <input type="text" placeholder="Search projects..." id="search-inp" oninput="handleSearch(this.value)" autocomplete="off">
+   <input type="text" placeholder="Search projects, tags, descriptions..." id="search-inp" oninput="handleSearch(this.value)">
   </div>
   <div class="topbar-right">
    <div class="topbar-notif" onclick="openOv('ov-requests')" title="Access Requests" id="notif-btn">
@@ -846,35 +527,30 @@ html,body{
  </div>
 
  <div class="main-layout">
-
-  <!-- Sidebar overlay (mobile) -->
-  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-  <!-- SIDEBAR -->
-  <div class="sidebar" id="sidebar">
+  <div class="sidebar">
    <div class="sidebar-section">
     <div class="sidebar-label">Workspace</div>
-    <div class="sidebar-item active" id="nav-home" onclick="showView('home');closeSidebar()"><span class="si-ic">🏠</span> Dashboard</div>
-    <div class="sidebar-item" id="nav-projects" onclick="showView('projects');closeSidebar()"><span class="si-ic">📁</span> All Projects</div>
-    <div class="sidebar-item" id="nav-my" onclick="showView('my');closeSidebar()"><span class="si-ic">⭐</span> My Projects</div>
-    <div class="sidebar-item" id="nav-starred" onclick="showView('starred');closeSidebar()"><span class="si-ic">✨</span> Starred</div>
-    <div class="sidebar-item" id="nav-private" onclick="showView('private');closeSidebar()"><span class="si-ic">🔒</span> Private</div>
+    <div class="sidebar-item active" id="nav-home" onclick="showView('home')"><span class="si-ic">🏠</span> Dashboard</div>
+    <div class="sidebar-item" id="nav-projects" onclick="showView('projects')"><span class="si-ic">📁</span> All Projects</div>
+    <div class="sidebar-item" id="nav-my" onclick="showView('my')"><span class="si-ic">⭐</span> My Projects</div>
+    <div class="sidebar-item" id="nav-starred" onclick="showView('starred')"><span class="si-ic">✨</span> Starred</div>
+    <div class="sidebar-item" id="nav-private" onclick="showView('private')"><span class="si-ic">🔒</span> Private</div>
    </div>
    <div class="sidebar-section">
     <div class="sidebar-label">Community</div>
-    <div class="sidebar-item" id="nav-people" onclick="showView('people');closeSidebar()"><span class="si-ic">👥</span> People</div>
+    <div class="sidebar-item" id="nav-people" onclick="showView('people')"><span class="si-ic">👥</span> People</div>
    </div>
    <div class="sidebar-section">
     <div class="sidebar-label">Quick Actions</div>
-    <div class="sidebar-item" onclick="openUpload();closeSidebar()"><span class="si-ic">➕</span> New Project</div>
-    <div class="sidebar-item" onclick="openOv('ov-join');closeSidebar()"><span class="si-ic">🔑</span> Join with Code</div>
+    <div class="sidebar-item" onclick="openUpload()"><span class="si-ic">➕</span> New Project</div>
+    <div class="sidebar-item" onclick="openOv('ov-join')"><span class="si-ic">🔑</span> Join with Code</div>
    </div>
    <div class="sidebar-foot">
-    <strong>NEXUSvault</strong><br>v1.0 · 2024
+    <strong>NEXUSvault</strong><br>v1.0 · 2026
+    
    </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
 
    <!-- DASHBOARD -->
@@ -882,8 +558,8 @@ html,body{
     <div class="page-hdr">
      <div><h2 id="home-greeting">Welcome back 👋</h2><p>Your workspace at a glance</p></div>
      <div class="hdr-acts">
-      <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')">🔑 Join</button>
-      <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New</button>
+      <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')">🔑 Join Project</button>
+      <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New Project</button>
      </div>
     </div>
     <div class="stats-row" id="home-stats"></div>
@@ -916,8 +592,8 @@ html,body{
    <!-- MY PROJECTS -->
    <div class="view" id="view-my">
     <div class="page-hdr">
-     <div><h2>My Projects</h2><p>Projects you lead or collaborate on</p></div>
-     <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New</button>
+     <div><h2>My Projects</h2><p>Projects where you are head or a collaborator</p></div>
+     <button class="btn btn-primary btn-sm" onclick="openUpload()">➕ New Project</button>
     </div>
     <div class="doc-grid" id="my-grid"></div>
    </div>
@@ -945,31 +621,9 @@ html,body{
     <div id="profile-content"></div>
    </div>
 
-  </div><!-- /.content -->
- </div><!-- /.main-layout -->
-
- <!-- BOTTOM NAV (mobile) -->
- <nav class="bottom-nav" id="bottom-nav">
-  <div class="bnav-items">
-   <div class="bnav-item active" id="bnav-home" onclick="showView('home')">
-    <span class="bnav-ic">🏠</span>Home
-   </div>
-   <div class="bnav-item" id="bnav-projects" onclick="showView('projects')">
-    <span class="bnav-ic">📁</span>Projects
-   </div>
-   <div class="bnav-item" onclick="openUpload()">
-    <span class="bnav-ic">➕</span>New
-   </div>
-   <div class="bnav-item" id="bnav-people" onclick="showView('people')">
-    <span class="bnav-ic">👥</span>People
-   </div>
-   <div class="bnav-item" id="bnav-profile" onclick="showView('profile')">
-    <span class="bnav-ic">👤</span>Profile
-   </div>
   </div>
- </nav>
-
-</div><!-- /#app -->
+ </div>
+</div>
 
 
 <!-- ═══════════ MODALS ═══════════ -->
@@ -979,7 +633,7 @@ html,body{
  <div class="modal modal-lg">
   <button class="m-close" onclick="closeOv('ov-upload')">✕</button>
   <div class="m-title">New Project</div>
-  <div class="m-sub">Upload a file, zip folder, or any artifact</div>
+  <div class="m-sub">Upload a single file, a zip folder, or any other artifact</div>
 
   <div class="field"><label>Project Title *</label><input type="text" id="up-title" placeholder="My Awesome Project"></div>
   <div class="field"><label>Description</label><input type="text" id="up-desc" placeholder="Brief description..."></div>
@@ -1006,7 +660,7 @@ html,body{
     <div class="vis-opt private" id="vis-priv" onclick="setVis('private')">
      <div class="vo-icon">🔒</div>
      <div class="vo-title">Private</div>
-     <div class="vo-desc">You become Head — approve members</div>
+     <div class="vo-desc">You become Head — approve members & manage roles</div>
      <span class="vis-check">✓</span>
     </div>
    </div>
@@ -1015,9 +669,9 @@ html,body{
   <div style="margin-top:1rem">
    <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
     <span class="uz-icon">📦</span>
-    <div class="uz-title">Tap or drop file here</div>
-    <div class="uz-sub">Any file type — single file, zip, image, PDF, code…</div>
-    <input type="file" id="up-file" onchange="handleFileSelect(this)" accept="*/*">
+    <div class="uz-title">Drop file or folder here</div>
+    <div class="uz-sub">Any file type — single file, zip archive, image, PDF, code, or anything else</div>
+    <input type="file" id="up-file" onchange="handleFileSelect(this)">
    </div>
    <div class="upload-preview" id="upload-preview">
     <span class="up-icon" id="up-file-icon">📄</span>
@@ -1043,7 +697,7 @@ html,body{
   <div class="m-title">🔐 Private Project Created</div>
   <div class="m-sub">You are now the <strong>Head</strong> of this project. Share the code below — members will request access and you decide their role.</div>
   <div class="code-display" id="code-show-digits"></div>
-  <p style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:1rem">Members must enter this code and await your approval.</p>
+  <p style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:1rem">Members must enter this code and await your approval before accessing the project.</p>
   <div class="m-acts">
    <button class="btn btn-ghost" onclick="copyCode()">📋 Copy Code</button>
    <button class="btn btn-primary" onclick="closeOv('ov-code-show')">Done</button>
@@ -1057,16 +711,16 @@ html,body{
   <button class="m-close" onclick="closeOv('ov-join')">✕</button>
   <div class="m-title">🔑 Join Private Project</div>
   <div class="m-sub">Enter the 6-digit code shared by the project head</div>
-  <div class="field"><label>Project Title</label><input type="text" id="join-project-search" placeholder="Search project name..." oninput="searchForJoin(this.value)" autocomplete="off"></div>
+  <div class="field"><label>Project Title</label><input type="text" id="join-project-search" placeholder="Search project name..." oninput="searchForJoin(this.value)"></div>
   <div id="join-search-results" style="margin-bottom:.75rem"></div>
   <div class="field"><label>6-Digit Access Code</label>
    <div class="code-input" id="code-input-boxes">
-    <input maxlength="1" oninput="codeDigitInput(this,0)" onkeydown="codeDigitKey(event,0)" inputmode="numeric" pattern="[0-9]">
-    <input maxlength="1" oninput="codeDigitInput(this,1)" onkeydown="codeDigitKey(event,1)" inputmode="numeric" pattern="[0-9]">
-    <input maxlength="1" oninput="codeDigitInput(this,2)" onkeydown="codeDigitKey(event,2)" inputmode="numeric" pattern="[0-9]">
-    <input maxlength="1" oninput="codeDigitInput(this,3)" onkeydown="codeDigitKey(event,3)" inputmode="numeric" pattern="[0-9]">
-    <input maxlength="1" oninput="codeDigitInput(this,4)" onkeydown="codeDigitKey(event,4)" inputmode="numeric" pattern="[0-9]">
-    <input maxlength="1" oninput="codeDigitInput(this,5)" onkeydown="codeDigitKey(event,5)" inputmode="numeric" pattern="[0-9]">
+    <input maxlength="1" oninput="codeDigitInput(this,0)" onkeydown="codeDigitKey(event,0)">
+    <input maxlength="1" oninput="codeDigitInput(this,1)" onkeydown="codeDigitKey(event,1)">
+    <input maxlength="1" oninput="codeDigitInput(this,2)" onkeydown="codeDigitKey(event,2)">
+    <input maxlength="1" oninput="codeDigitInput(this,3)" onkeydown="codeDigitKey(event,3)">
+    <input maxlength="1" oninput="codeDigitInput(this,4)" onkeydown="codeDigitKey(event,4)">
+    <input maxlength="1" oninput="codeDigitInput(this,5)" onkeydown="codeDigitKey(event,5)">
    </div>
   </div>
   <div class="field"><label>Message to Head (optional)</label><input type="text" id="join-msg" placeholder="Why you'd like access..." maxlength="200"></div>
@@ -1083,7 +737,7 @@ html,body{
  <div class="modal modal-xl">
   <button class="m-close" onclick="closeOv('ov-detail')">✕</button>
   <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;padding-right:2rem;margin-bottom:1rem">
-   <div style="flex:1;min-width:180px">
+   <div style="flex:1;min-width:200px">
     <div class="m-title" id="det-title"></div>
     <div style="display:flex;align-items:center;gap:.5rem;margin-top:.4rem;flex-wrap:wrap">
      <span id="det-vis-badge"></span>
@@ -1097,30 +751,30 @@ html,body{
   </div>
   <p style="font-size:13px;color:var(--text2);margin-bottom:1rem" id="det-desc"></p>
 
-  <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
-   <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0;min-height:36px" onchange="loadVersion(this.value)"></select>
+  <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap">
+   <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0" onchange="loadVersion(this.value)"></select>
    <button class="btn btn-ghost btn-sm" id="btn-diff" onclick="openDiff()">↔ Compare</button>
    <button class="btn btn-ghost btn-sm" id="btn-new-ver" onclick="openNewVersion()">🔄 New Version</button>
-   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" target="_blank">⬇ Download</a>
-   <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Del Version</button>
+   <button class="btn btn-ghost btn-sm" id="det-dl-btn" onclick="downloadCurrentVersion()">⬇ Download</button>
+   <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Delete Version</button>
   </div>
 
   <div id="det-viewer"></div>
 
   <div class="m-divider"></div>
   <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
-   <div style="flex:1;min-width:200px">
+   <div style="flex:1;min-width:220px">
     <div class="sh">Version Details</div>
     <div id="det-ver-info" style="font-size:13px;color:var(--text2)"></div>
    </div>
-   <div style="flex:1;min-width:200px" id="det-members-box"></div>
+   <div style="flex:1;min-width:220px" id="det-members-box"></div>
   </div>
 
   <div class="m-divider"></div>
   <div class="sh">Comments</div>
-  <div id="det-comments" style="max-height:200px;overflow-y:auto;margin-bottom:.75rem"></div>
+  <div id="det-comments" style="max-height:220px;overflow-y:auto;margin-bottom:.75rem"></div>
   <div style="display:flex;gap:.5rem">
-   <input type="text" id="comment-inp" placeholder="Add a comment..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:.55rem .9rem;color:var(--text);font-size:14px;outline:none;min-height:44px" onkeydown="if(event.key==='Enter')postComment()">
+   <input type="text" id="comment-inp" placeholder="Add a comment..." style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:.55rem .9rem;color:var(--text);font-size:13px;outline:none" onkeydown="if(event.key==='Enter')postComment()">
    <button class="btn btn-primary btn-sm" onclick="postComment()">Post</button>
   </div>
  </div>
@@ -1142,7 +796,7 @@ html,body{
   </div>
   <div class="upload-zone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDropNV(event)">
    <span class="uz-icon">📁</span>
-   <div class="uz-title">Tap or drop new file here</div>
+   <div class="uz-title">Drop new file or folder here</div>
    <div class="uz-sub">Any file type — updated source, new build, revised doc</div>
    <input type="file" id="nv-file" onchange="handleNVFile(this)">
   </div>
@@ -1172,7 +826,7 @@ html,body{
    <div class="field" style="margin:0"><label>Version B</label><select id="diff-v2"></select></div>
   </div>
   <button class="btn btn-primary btn-sm" onclick="runDiff()" style="margin-bottom:1rem">Run Comparison</button>
-  <div id="diff-result" style="overflow-x:auto"></div>
+  <div id="diff-result"></div>
  </div>
 </div>
 
@@ -1199,12 +853,10 @@ html,body{
   </div>
 
   <div class="sh">Members</div>
-  <div class="member-table-wrap">
-   <table class="member-table" id="members-table">
-    <thead><tr><th>User</th><th>Role</th><th>Since</th><th>Actions</th></tr></thead>
-    <tbody id="members-tbody"></tbody>
-   </table>
-  </div>
+  <table class="member-table" id="members-table">
+   <thead><tr><th>User</th><th>Role</th><th>Since</th><th>Actions</th></tr></thead>
+   <tbody id="members-tbody"></tbody>
+  </table>
 
   <div class="m-divider"></div>
   <div class="sh">Access Code</div>
@@ -1228,7 +880,7 @@ html,body{
   </div>
 
   <div class="field-row">
-   <div class="field"><label>Full Name</label><input type="text" id="prof-name" autocomplete="name"></div>
+   <div class="field"><label>Full Name</label><input type="text" id="prof-name"></div>
    <div class="field"><label>Title</label><input type="text" id="prof-title" placeholder="e.g. Senior Engineer"></div>
   </div>
   <div class="field-row">
@@ -1236,8 +888,8 @@ html,body{
    <div class="field"><label>Location</label><input type="text" id="prof-location" placeholder="City, Country"></div>
   </div>
   <div class="field-row">
-   <div class="field"><label>Phone</label><input type="tel" id="prof-phone" inputmode="tel"></div>
-   <div class="field"><label>Website</label><input type="url" id="prof-website" placeholder="https://..." inputmode="url"></div>
+   <div class="field"><label>Phone</label><input type="text" id="prof-phone"></div>
+   <div class="field"><label>Website</label><input type="text" id="prof-website" placeholder="https://..."></div>
   </div>
   <div class="field"><label>Bio</label><textarea id="prof-bio" rows="3" placeholder="A short bio (max 280 characters)"></textarea></div>
   <div class="field">
@@ -1258,8 +910,8 @@ html,body{
  <div class="modal">
   <button class="m-close" onclick="closeOv('ov-change-pass')">✕</button>
   <div class="m-title">🔑 Change Password</div>
-  <div class="field"><label>Current Password</label><input type="password" id="cp-cur" placeholder="••••••••" autocomplete="current-password"></div>
-  <div class="field"><label>New Password</label><input type="password" id="cp-new" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+  <div class="field"><label>Current Password</label><input type="password" id="cp-cur" placeholder="••••••••"></div>
+  <div class="field"><label>New Password</label><input type="password" id="cp-new" placeholder="Min. 6 characters"></div>
   <div class="m-acts">
    <button class="btn btn-ghost" onclick="closeOv('ov-change-pass')">Cancel</button>
    <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
@@ -1293,41 +945,6 @@ let SELECTED_VIS = 'public';
 
 const AVATAR_COLORS = ['#5b8cff','#a855f7','#22d3ee','#22c55e','#f59e0b','#f97316','#ec4899','#ef4444','#6366f1','#a78bfa'];
 
-// ═══════════════════ SIDEBAR (MOBILE) ═══════════════════
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  const isOpen  = sidebar.classList.contains('open');
-  sidebar.classList.toggle('open', !isOpen);
-  overlay.classList.toggle('show', !isOpen);
-  document.body.style.overflow = isOpen ? '' : 'hidden';
-}
-
-function closeSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
-  sidebar.classList.remove('open');
-  overlay.classList.remove('show');
-  document.body.style.overflow = '';
-}
-
-// Close sidebar when swipping left on the overlay
-let touchStartX = 0;
-document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive:true });
-document.addEventListener('touchmove', e => {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar.classList.contains('open')) return;
-  const dx = e.touches[0].clientX - touchStartX;
-  if (dx < -60) closeSidebar();
-}, { passive:true });
-
-// ═══════════════════ BOTTOM NAV SYNC ═══════════════════
-function updateBottomNav(viewName) {
-  document.querySelectorAll('.bnav-item').forEach(el => el.classList.remove('active'));
-  const map = { home:'bnav-home', projects:'bnav-projects', people:'bnav-people', profile:'bnav-profile' };
-  if (map[viewName]) document.getElementById(map[viewName])?.classList.add('active');
-}
-
 // ═══════════════════ HTTP ═══════════════════
 async function http(method, path, body, isForm) {
   const opts = { method, headers: { Authorization: `Bearer ${TOKEN}` } };
@@ -1339,6 +956,30 @@ async function http(method, path, body, isForm) {
   const data = await res.json();
   if (!data.success) { const err = new Error(data.message || 'Request failed'); err.data = data; throw err; }
   return data;
+}
+
+// ═══════════════════ DOWNLOAD (authenticated) ═══════════════════
+// FIX: <a href download> does NOT send the JWT token → server returns 401.
+// Instead we fetch with the Bearer header, get a blob, and trigger via objectURL.
+async function downloadFile(url, fileName) {
+  try {
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+    if (!res.ok) { toast('Download failed — ' + res.status, 'error'); return; }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName || 'download';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  } catch(e) { toast('Download error: ' + e.message, 'error'); }
+}
+
+function downloadCurrentVersion() {
+  const btn = document.getElementById('det-dl-btn');
+  const url  = btn?.dataset?.url;
+  const name = btn?.dataset?.name || 'download';
+  if (url) downloadFile(url, name);
 }
 
 // ═══════════════════ TOAST ═══════════════════
@@ -1354,22 +995,13 @@ function toast(msg, type='info') {
 // ═══════════════════ MODAL ═══════════════════
 function openOv(id) {
   document.getElementById(id).classList.add('show');
-  // Prevent body scroll behind modal
-  document.body.style.overflow = 'hidden';
   if (id === 'ov-requests') loadAllRequests();
   if (id === 'ov-edit-profile') openEditProfile();
 }
-function closeOv(id) {
-  document.getElementById(id).classList.remove('show');
-  // Restore scroll if no other modals open
-  if (!document.querySelector('.ov.show')) document.body.style.overflow = '';
-}
+function closeOv(id) { document.getElementById(id).classList.remove('show'); }
 document.addEventListener('click', e => {
   document.querySelectorAll('.ov.show').forEach(ov => {
-    if (e.target === ov) {
-      ov.classList.remove('show');
-      if (!document.querySelector('.ov.show')) document.body.style.overflow = '';
-    }
+    if (e.target === ov) ov.classList.remove('show');
   });
   if (!e.target.closest('#user-dropdown')) {
     document.getElementById('dd-menu').classList.remove('show');
@@ -1469,7 +1101,6 @@ function showView(name) {
   document.getElementById(`view-${name}`)?.classList.add('active');
   document.getElementById(`nav-${name}`)?.classList.add('active');
   document.getElementById('dd-menu').classList.remove('show');
-  updateBottomNav(name);
 
   if (name === 'home')    { renderHomeStats(); renderHomeRecent(); }
   if (name === 'projects'){ renderGrid('projects-grid', ALL_DOCS); }
@@ -1661,7 +1292,7 @@ function showCodeDisplay(code) {
 }
 
 function copyCode() {
-  navigator.clipboard?.writeText(window._lastCode || '').catch(() => {});
+  navigator.clipboard.writeText(window._lastCode || '');
   toast('Code copied!','success');
 }
 
@@ -1700,22 +1331,25 @@ function populateDetail() {
   document.getElementById('det-head-badge').innerHTML =
     isHead ? `<span class="role-badge head">★ Head</span>` : (myMember ? `<span class="role-badge ${myMember.role}">${myMember.role}</span>` : '');
 
+  // Version select
   const sel = document.getElementById('det-ver-select');
   sel.innerHTML = doc.versions.map(v =>
     `<option value="${v.versionNumber}">v${v.versionNumber} — ${esc(v.message)}</option>`
   ).join('');
   sel.value = doc.versions[doc.versions.length-1]?.versionNumber;
 
+  // Actions
   const acts = document.getElementById('det-actions');
   let html = `<button class="btn btn-ghost btn-sm" onclick="toggleStar()">${isStarred?'★ Starred':'☆ Star'}</button>`;
   if (isHead) {
     html += `<button class="btn btn-ghost btn-sm" onclick="openMembers()">👥 Members</button>`;
-    html += `<button class="btn btn-red btn-sm" onclick="deleteCurrentProject()">🗑 Delete</button>`;
+    html += `<button class="btn btn-red btn-sm" onclick="deleteCurrentProject()">🗑 Delete Project</button>`;
   }
   acts.innerHTML = html;
 
   document.getElementById('btn-new-ver').style.display = canEdit ? '' : 'none';
 
+  // Diff selects
   const dv1 = document.getElementById('diff-v1');
   const dv2 = document.getElementById('diff-v2');
   dv1.innerHTML = dv2.innerHTML = doc.versions.map(v=>`<option value="${v.versionNumber}">v${v.versionNumber}</option>`).join('');
@@ -1735,8 +1369,9 @@ function loadVersion(vNum) {
 
   const dlUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/download`;
   const prvUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/preview`;
-  document.getElementById('det-dl-btn').href = dlUrl;
-  document.getElementById('det-dl-btn').download = CUR_VER.fileName || 'download';
+  // Store dlUrl for the download button (token-authenticated fetch used)
+  document.getElementById('det-dl-btn').dataset.url = dlUrl;
+  document.getElementById('det-dl-btn').dataset.name = CUR_VER.fileName || 'download';
 
   document.getElementById('det-ver-info').innerHTML = `
     <span style="color:var(--accent);font-weight:600;font-family:var(--display)">v${CUR_VER.versionNumber}</span> ·
@@ -1745,6 +1380,7 @@ function loadVersion(vNum) {
     ${CUR_VER.fileName ? `<br><span style="font-family:var(--mono);font-size:11px;color:var(--text3)">${esc(CUR_VER.fileName)} ${fmtSize(CUR_VER.fileSize)}</span>` : ''}
   `;
 
+  // Show delete-version button only if head AND >1 versions
   const delBtn = document.getElementById('btn-del-ver');
   delBtn.style.display = (CUR_IS_HEAD && CUR_DOC.versions.length > 1) ? '' : 'none';
 
@@ -1770,31 +1406,31 @@ function renderVersionContent(v, prvUrl, dlUrl) {
   const mime = v.mimeType || '';
 
   if (mime.includes('pdf') || ext === 'pdf') {
-    container.innerHTML = `<div class="file-viewer" style="height:400px"><div class="fv-content" style="flex:1"><iframe src="${prvUrl}" title="PDF" style="width:100%;height:100%;border:none"></iframe></div></div>`;
+    container.innerHTML = `<div class="file-viewer" style="height:460px"><div class="fv-content" style="flex:1"><iframe src="${prvUrl}" title="PDF" style="width:100%;height:100%;border:none"></iframe></div></div>`;
   } else if (mime.startsWith('image/') || ['jpg','jpeg','png','gif','webp','svg'].includes(ext)) {
-    container.innerHTML = `<div style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center;overflow:hidden">
-      <img src="${prvUrl}" alt="${esc(v.fileName)}" style="max-width:100%;max-height:360px;border-radius:8px;height:auto">
+    container.innerHTML = `<div style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center">
+      <img src="${prvUrl}" alt="${esc(v.fileName)}" style="max-width:100%;max-height:400px;border-radius:8px">
     </div>`;
   } else if (ext === 'csv' && v.content) {
-    container.innerHTML = `<div style="overflow:auto;max-height:340px;border:1px solid var(--border);border-radius:var(--r)">${parseCsvTable(v.content)}</div>`;
+    container.innerHTML = `<div style="overflow:auto;max-height:380px;border:1px solid var(--border);border-radius:var(--r)">${parseCsvTable(v.content)}</div>`;
   } else if (ext === 'json' && v.content) {
     let p = v.content; try { p = JSON.stringify(JSON.parse(v.content),null,2); } catch {}
-    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:340px;overflow:auto;color:var(--text2)">${esc(p)}</pre>`;
+    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:380px;overflow:auto;color:var(--text2)">${esc(p)}</pre>`;
   } else if (['doc','docx','xls','xlsx','pptx'].includes(ext)) {
     container.innerHTML = `<div class="empty-state">
       <div class="es-icon">${ext.includes('xl')?'📊':ext.includes('ppt')?'📊':'📝'}</div>
       <h3>${esc(v.fileName)}</h3>
       <p>This file type cannot be previewed in the browser.</p>
-      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download to Open</a>
+      <button onclick="downloadFile('${dlUrl}','${v.fileName}')" class="btn btn-primary btn-sm" style="margin-top:1rem">⬇ Download to Open</button>
     </div>`;
   } else if (v.content) {
-    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:340px;overflow:auto;color:var(--text2);white-space:pre-wrap;word-break:break-all">${esc(v.content)}</pre>`;
+    container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:380px;overflow:auto;color:var(--text2);white-space:pre-wrap;word-break:break-all">${esc(v.content)}</pre>`;
   } else {
     container.innerHTML = `<div class="empty-state">
       <div class="es-icon">📄</div>
       <h3>${esc(v.fileName || 'File')}</h3>
       <p>${fmtSize(v.fileSize)} — No preview available</p>
-      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download</a>
+      <button onclick="downloadFile('${dlUrl}','${v.fileName}')" class="btn btn-primary btn-sm" style="margin-top:1rem">⬇ Download</button>
     </div>`;
   }
 }
@@ -1804,9 +1440,10 @@ async function toggleStar() {
   try {
     const d = await http('POST', `/documents/${CUR_DOC._id}/star`);
     toast(d.isStarred ? 'Starred!' : 'Unstarred', 'success');
-    await loadDocs();
-    const fresh = await http('GET', `/documents/${CUR_DOC._id}`);
-    CUR_DOC = fresh.document; CUR_IS_HEAD = !!fresh.isHead;
+    // SPEED FIX: update local state only — avoid re-fetching entire doc list + full doc
+    CUR_DOC.isStarred = d.isStarred;
+    const card = document.querySelector(`[data-id="${CUR_DOC._id}"] .star-btn`);
+    if (card) card.classList.toggle('active', !!d.isStarred);
     populateDetail();
   } catch(e) { toast(e.message,'error'); }
 }
@@ -1898,10 +1535,10 @@ function loadComments() {
     const canDel = c.user?.toString() === ME._id || CUR_IS_HEAD;
     return `<div style="display:flex;gap:.6rem;margin-bottom:.75rem;align-items:flex-start">
       <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff">${esc(c.userName[0])}</div>
-      <div style="flex:1;min-width:0">
+      <div style="flex:1">
         <span style="font-size:12px;font-weight:600">${esc(c.userName)}</span>
         <span style="font-size:11px;color:var(--text3);margin-left:.4rem">${fmtDate(c.createdAt)}</span>
-        <div style="font-size:13px;color:var(--text2);margin-top:2px;word-break:break-word">${esc(c.text)}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:2px">${esc(c.text)}</div>
       </div>
       ${canDel ? `<button class="up-clear" onclick="deleteComment('${c._id}')" title="Delete">✕</button>` : ''}
     </div>`;
@@ -1913,11 +1550,13 @@ async function postComment() {
   const text = inp.value.trim();
   if (!text) return;
   try {
-    await http('POST', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}/comments`, { text });
+    const d = await http('POST', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}/comments`, { text });
     inp.value = '';
-    const d = await http('GET', `/documents/${CUR_DOC._id}`);
-    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
-    CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === CUR_VER.versionNumber);
+    // SPEED FIX: push the returned comment locally — no need to re-fetch the whole doc
+    if (d.comment) {
+      CUR_VER.comments = CUR_VER.comments || [];
+      CUR_VER.comments.push(d.comment);
+    }
     loadComments();
     toast('Comment posted','success');
   } catch(e) { toast(e.message,'error'); }
@@ -1926,9 +1565,8 @@ async function postComment() {
 async function deleteComment(cid) {
   try {
     await http('DELETE', `/documents/${CUR_DOC._id}/versions/${CUR_VER.versionNumber}/comments/${cid}`);
-    const d = await http('GET', `/documents/${CUR_DOC._id}`);
-    CUR_DOC = d.document; CUR_IS_HEAD = !!d.isHead;
-    CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === CUR_VER.versionNumber);
+    // SPEED FIX: remove comment locally — no need to re-fetch the whole doc
+    if (CUR_VER.comments) CUR_VER.comments = CUR_VER.comments.filter(c => c._id !== cid);
     loadComments();
     toast('Comment deleted','success');
   } catch(e) { toast(e.message,'error'); }
@@ -1991,15 +1629,17 @@ async function doNewVersion() {
 // ═══════════════════ DIFF ═══════════════════
 function openDiff() { openOv('ov-diff'); document.getElementById('diff-result').innerHTML = ''; TREE_DIFF=null; OPEN_DIRS=new Set(); SEL_FILE=null; }
 
-let TREE_DIFF = null;
-let OPEN_DIRS = new Set();
-let SEL_FILE  = null;
+// State for tree comparison (shared between v1 and v2 panels for sync)
+let TREE_DIFF = null;          // server payload
+let OPEN_DIRS = new Set();     // expanded folder paths (without trailing /)
+let SEL_FILE  = null;          // currently selected file path
 
 async function runDiff() {
   const v1 = document.getElementById('diff-v1').value;
   const v2 = document.getElementById('diff-v2').value;
   if (v1 === v2) { toast('Select two different versions','warn'); return; }
   try {
+    // Always use the richer tree-diff endpoint. It works for single files too.
     const d = await http('GET', `/documents/${CUR_DOC._id}/tree-diff?v1=${v1}&v2=${v2}`);
     TREE_DIFF = d; OPEN_DIRS = new Set(); SEL_FILE = null;
     const container = document.getElementById('diff-result');
@@ -2009,6 +1649,7 @@ async function runDiff() {
       return;
     }
 
+    // Single file → fall back to the line diff (call file-diff for precision)
     const fname = d.versionA.fileName || d.versionB.fileName || 'file';
     const fd = await http('GET', `/documents/${CUR_DOC._id}/file-diff?v1=${v1}&v2=${v2}&path=${encodeURIComponent(fname)}`);
     container.innerHTML = renderFileDiffHtml(fd, d.versionA, d.versionB);
@@ -2026,8 +1667,7 @@ function renderTreeCompare() {
       <span class="pill" style="color:#fcd34d">~${t.modified} modified</span>
       <span class="pill">${t.same} unchanged</span>
     </div>
-    <div style="overflow-x:auto">
-    <div class="tcmp-wrap" style="min-width:480px">
+    <div class="tcmp-wrap">
       <div class="tcmp-head">
         <div>v${d.versionA.number} — ${esc(d.versionA.message)} (${esc(d.versionA.author)})</div>
         <div>v${d.versionB.number} — ${esc(d.versionB.message)} (${esc(d.versionB.author)})</div>
@@ -2037,15 +1677,21 @@ function renderTreeCompare() {
         <div class="tcmp-col" id="tcmp-b">${renderTreeSide(d.versionB.tree || [], 'B', '')}</div>
       </div>
     </div>
-    </div>
     <div id="tcmp-file-diff" style="margin-top:1rem"></div>
-    <p style="font-size:11px;color:var(--text3);margin-top:.5rem">💡 Tap a folder to expand · Tap a file to see line-level diff</p>
+    <p style="font-size:11px;color:var(--text3);margin-top:.5rem">💡 Click a folder to expand it (the other side mirrors automatically). Click a file to see the line-level diff below.</p>
   `;
 }
 
+// Render one side. Walk each node; if a folder, render header then children
+// (only when in OPEN_DIRS). For folders/files missing on the OTHER side we
+// also need to render placeholders so rows align — we instead render a UNION
+// of paths derived from fileStatus.
 function renderTreeSide(_treeIgnored, side, _parentPath) {
+  // We render based on the union of paths from fileStatus to keep both
+  // panels perfectly aligned row-by-row.
   const d = TREE_DIFF;
   const own = side === 'A' ? d.versionA.tree : d.versionB.tree;
+  // Build a path → node map for own side so we know what exists locally.
   const ownSet = new Set();
   (function walk(nodes, prefix){
     (nodes||[]).forEach(n => {
@@ -2055,18 +1701,22 @@ function renderTreeSide(_treeIgnored, side, _parentPath) {
     });
   })(own || [], '');
 
+  // Sort union paths so folders come before their contents.
   const paths = Object.keys(d.fileStatus).sort();
 
+  // Aggregate per-folder change counts from descendant FILES.
+  // folderChanges[folderPath] = { added, modified, removed }
   const folderChanges = {};
   function bump(folder, key){
     if (!folderChanges[folder]) folderChanges[folder] = {added:0, modified:0, removed:0};
     folderChanges[folder][key]++;
   }
   for (const p of paths) {
-    if (p.endsWith('/')) continue;
+    if (p.endsWith('/')) continue; // only files contribute
     const st = d.fileStatus[p].status;
     if (st === 'same') continue;
     const segs = p.split('/');
+    // walk every ancestor folder
     for (let i = 1; i < segs.length; i++) {
       const folder = segs.slice(0, i).join('/');
       if (st === 'added') bump(folder, 'added');
@@ -2083,12 +1733,13 @@ function renderTreeSide(_treeIgnored, side, _parentPath) {
     const depth = segs.length - 1;
     const name  = segs[segs.length - 1];
 
+    // Hide rows whose parent folder is not expanded
     if (depth > 0) {
       const parent = segs.slice(0, -1).join('/');
       if (!OPEN_DIRS.has(parent)) continue;
     }
 
-    const status = d.fileStatus[p].status;
+    const status = d.fileStatus[p].status;     // added | removed | modified | same
     const existsHere = ownSet.has(p);
     let cls = status;
     if (!existsHere) cls = 'missing';
@@ -2104,7 +1755,9 @@ function renderTreeSide(_treeIgnored, side, _parentPath) {
       if (fc && (fc.added || fc.modified || fc.removed)) {
         extraCls = ' has-changes';
         const total = fc.added + fc.modified + fc.removed;
-        dots = '<span class="chg-dots">'
+        dots = '<span class="chg-dots" title="'
+          + `${fc.added} added, ${fc.modified} modified, ${fc.removed} removed`
+          + '">'
           + (fc.added    ? '<span class="chg-dot a"></span>' : '')
           + (fc.modified ? '<span class="chg-dot m"></span>' : '')
           + (fc.removed  ? '<span class="chg-dot r"></span>' : '')
@@ -2125,6 +1778,7 @@ function renderTreeSide(_treeIgnored, side, _parentPath) {
 
 function toggleDir(p) {
   if (OPEN_DIRS.has(p)) OPEN_DIRS.delete(p); else OPEN_DIRS.add(p);
+  // Re-render BOTH sides so they stay synchronized.
   document.getElementById('tcmp-a').innerHTML = renderTreeSide(null, 'A', '');
   document.getElementById('tcmp-b').innerHTML = renderTreeSide(null, 'B', '');
 }
@@ -2159,17 +1813,15 @@ function renderFileDiffHtml(d, vA, vB) {
         <span style="color:var(--red);margin-left:8px">−${d.stats.removed} removed</span>
         <span style="margin-left:8px">${d.stats.unchanged} unchanged</span>
       </div>
-      <div style="overflow-x:auto">
       <div class="diff-view">
         <div class="diff-header">
-          <div class="diff-header-col">v${vA.number} — ${esc(vA.message)}</div>
-          <div class="diff-header-col">v${vB.number} — ${esc(vB.message)}</div>
+          <div class="diff-header-col">v${vA.number} — ${esc(vA.message)} (${esc(vA.author)})</div>
+          <div class="diff-header-col">v${vB.number} — ${esc(vB.message)} (${esc(vB.author)})</div>
         </div>
         <div class="diff-body">
           <div class="diff-col">${linesA.join('')}</div>
           <div class="diff-col" style="border-left:1px solid var(--border)">${linesB.join('')}</div>
         </div>
-      </div>
       </div>`;
 }
 
@@ -2190,6 +1842,7 @@ function searchForJoin(q) {
   const results = document.getElementById('join-search-results');
   q = (q || '').trim();
   if (!q) { results.innerHTML=''; JOIN_DOC_ID=null; return; }
+  // New search → invalidate previous selection
   JOIN_DOC_ID = null;
   results.innerHTML = '<p style="font-size:12px;color:var(--text3);padding:.5rem 0">🔍 Searching…</p>';
   searchJoinTimer = setTimeout(async () => {
@@ -2200,7 +1853,7 @@ function searchForJoin(q) {
         results.innerHTML = `<div style="padding:.75rem;text-align:center;color:var(--text3);font-size:12px;background:var(--bg3);border-radius:var(--r);border:1px dashed var(--border)">No private projects match "<b>${esc(q)}</b>"</div>`;
         return;
       }
-      const header = `<div style="font-size:11px;color:var(--text3);margin:.25rem 0 .4rem;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between"><span>${found.length} result${found.length===1?'':'s'}</span><span style="color:var(--accent)">Tap to select</span></div>`;
+      const header = `<div style="font-size:11px;color:var(--text3);margin:.25rem 0 .4rem;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between"><span>${found.length} result${found.length===1?'':'s'}</span><span style="color:var(--accent)">👆 click to select</span></div>`;
       results.innerHTML = header + found.map(d => {
         let tag;
         if (d.isBlocked)      tag = '<span style="color:var(--red);font-size:11px;font-weight:600">⛔ blocked</span>';
@@ -2212,7 +1865,7 @@ function searchForJoin(q) {
         const safeTitle = esc(d.title).replace(/'/g,"\\'");
         const selected  = JOIN_DOC_ID===d._id;
         return `
-        <div class="join-result" data-id="${d._id}" style="padding:.6rem .75rem;border-radius:var(--r);background:${selected?'var(--bg4)':'var(--bg3)'};cursor:pointer;font-size:13px;margin-bottom:.3rem;border:1px solid ${selected?'var(--accent)':'var(--border)'};transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-height:44px" onclick="selectJoinDoc('${d._id}','${safeTitle}',this)">
+        <div class="join-result" data-id="${d._id}" style="padding:.6rem .75rem;border-radius:var(--r);background:${selected?'var(--bg4,var(--bg3))':'var(--bg3)'};cursor:pointer;font-size:13px;margin-bottom:.3rem;border:1px solid ${selected?'var(--accent)':'var(--border)'};transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:.5rem" onclick="selectJoinDoc('${d._id}','${safeTitle}',this)" onmouseover="if(!this.classList.contains('sel'))this.style.borderColor='var(--text3)'" onmouseout="if(!this.classList.contains('sel'))this.style.borderColor='var(--border)'">
           <div style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🔒 <b>${titleHtml}</b> <span style="color:var(--text3);font-size:11px;font-weight:400">· by ${esc(d.ownerName)}</span></div>
           <div style="flex-shrink:0">${tag}</div>
         </div>`;
@@ -2235,12 +1888,13 @@ function selectJoinDoc(id, title, el) {
   document.querySelectorAll('#join-search-results .join-result').forEach(d => { d.style.borderColor = 'var(--border)'; d.classList.remove('sel'); });
   el.style.borderColor = 'var(--accent)';
   el.classList.add('sel');
+  // Visual confirmation + jump to next step
   const status = document.getElementById('join-status');
   status.style.display = 'block';
   status.style.background = 'var(--bg3)';
   status.style.border = '1px solid var(--accent)';
   status.style.color = 'var(--accent)';
-  status.innerHTML = `✓ Selected: <b>${esc(title)}</b> — now enter the 6-digit access code`;
+  status.innerHTML = `✓ Selected: <b>${esc(title)}</b> — now enter the 6-digit access code below`;
   const firstBox = document.querySelector('#code-input-boxes input');
   if (firstBox) firstBox.focus();
 }
@@ -2297,20 +1951,18 @@ async function loadAllRequests() {
       html += `<div style="margin-bottom:1rem">
         <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:.5rem;font-family:var(--display)">📁 ${esc(doc.title)}</div>
         ${pending.map(r => `
-          <div style="display:flex;align-items:flex-start;gap:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--r);margin-bottom:.5rem;border:1px solid var(--border);flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg3);border-radius:var(--r);margin-bottom:.5rem;border:1px solid var(--border);flex-wrap:wrap">
             <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:#fff">${esc(r.userName[0])}</div>
-            <div style="flex:1;min-width:120px">
+            <div style="flex:1;min-width:140px">
               <div style="font-size:13px;font-weight:600">${esc(r.userName)}</div>
               <div style="font-size:11px;color:var(--text3)">${esc(r.userEmail)} · ${fmtDate(r.requestedAt)}</div>
               ${r.message ? `<div style="font-size:12px;color:var(--text2);margin-top:4px;font-style:italic">"${esc(r.message)}"</div>` : ''}
             </div>
-            <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
-            <select id="role-${r._id}" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:.3rem .5rem;color:var(--text);font-size:12px;min-height:36px">
+            <select id="role-${r._id}" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:.3rem .5rem;color:var(--text);font-size:12px">
               <option value="viewer">Viewer</option><option value="editor">Editor</option>
             </select>
-            <button class="btn btn-green btn-sm" onclick="decideRequest('${doc._id}','${r._id}','approve',document.getElementById('role-${r._id}').value)">✅</button>
-            <button class="btn btn-red btn-sm" onclick="decideRequest('${doc._id}','${r._id}','reject')">❌</button>
-            </div>
+            <button class="btn btn-green btn-sm" onclick="decideRequest('${doc._id}','${r._id}','approve',document.getElementById('role-${r._id}').value)">✅ Approve</button>
+            <button class="btn btn-red btn-sm" onclick="decideRequest('${doc._id}','${r._id}','reject')">❌ Reject</button>
           </div>
         `).join('')}
       </div>`;
@@ -2339,7 +1991,7 @@ async function openMembers() {
 
     document.getElementById('members-stats').innerHTML = `
       👥 <strong>${members.length}</strong> member${members.length!==1?'s':''} ·
-      📋 <strong>${d.requests.length}</strong> total ·
+      📋 <strong>${d.requests.length}</strong> total requests ·
       ⏳ <strong>${d.requests.filter(r=>r.status==='pending').length}</strong> pending ·
       🚫 <strong>${members.filter(m=>m.isBlocked).length}</strong> blocked
     `;
@@ -2348,16 +2000,16 @@ async function openMembers() {
     tbody.innerHTML = members.length ? members.map(m => `
       <tr class="${m.isBlocked?'blocked':''}">
         <td>
-          <div style="font-weight:600;white-space:nowrap">${esc(m.userName)}</div>
+          <div style="font-weight:600">${esc(m.userName)}</div>
           <div style="font-size:11px;color:var(--text3)">${esc(m.email)}</div>
         </td>
         <td>
           <span class="role-badge ${m.role}">${m.role}</span>
           ${m.isBlocked?'<span class="role-badge blocked" style="margin-left:4px">blocked</span>':''}
         </td>
-        <td style="font-size:11px;color:var(--text3);white-space:nowrap">${fmtDate(m.grantedAt)}</td>
+        <td style="font-size:11px;color:var(--text3)">${fmtDate(m.grantedAt)}</td>
         <td>
-          <select onchange="changeMemberRole('${m._id}',this.value)" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 6px;font-size:11px;color:var(--text);margin-right:4px;min-height:32px">
+          <select onchange="changeMemberRole('${m._id}',this.value)" style="background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:2px 6px;font-size:11px;color:var(--text);margin-right:4px">
             <option value="viewer" ${m.role==='viewer'?'selected':''}>Viewer</option>
             <option value="editor" ${m.role==='editor'?'selected':''}>Editor</option>
           </select>
@@ -2374,7 +2026,7 @@ async function openMembers() {
             ${(CUR_DOC.accessCode||'------').split('').map(d=>`<div class="code-digit" style="width:36px;height:44px;font-size:18px">${d}</div>`).join('')}
           </div>
           <button class="btn btn-ghost btn-sm" onclick="regenCode()">🔄 Regenerate</button>
-          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard?.writeText('${CUR_DOC.accessCode||''}');toast('Copied!','success')">📋 Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${CUR_DOC.accessCode||''}');toast('Copied!','success')">📋 Copy</button>
         </div>`;
     } else {
       document.getElementById('members-code-section').innerHTML = '<p style="font-size:12px;color:var(--text3)">Public project — no access code needed</p>';
@@ -2459,21 +2111,21 @@ async function renderProfile(userId) {
     c.innerHTML = `
       <div class="profile-hero">
         <div class="profile-row">
-          <div class="avatar-lg" style="background:${u.avatarColor||'#5b8cff'};width:80px;height:80px;font-size:30px;flex-shrink:0">${esc(initial)}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.4px;word-break:break-word">${esc(u.name)}</div>
+          <div class="avatar-lg" style="background:${u.avatarColor||'#5b8cff'};width:96px;height:96px;font-size:36px">${esc(initial)}</div>
+          <div style="flex:1;min-width:240px">
+            <div style="font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.4px">${esc(u.name)}</div>
             <div style="color:var(--accent);font-size:13px;margin-top:2px">${esc(u.title||'')} ${u.title&&u.department?'·':''} ${esc(u.department||'')}</div>
-            ${u.bio?`<div style="color:var(--text2);font-size:13px;margin-top:.6rem">${esc(u.bio)}</div>`:''}
+            ${u.bio?`<div style="color:var(--text2);font-size:13px;margin-top:.6rem;max-width:600px">${esc(u.bio)}</div>`:''}
             <div class="profile-meta">
               ${u.location?`<span>📍 ${esc(u.location)}</span>`:''}
               <span>📧 ${esc(u.email)}</span>
               ${u.phone?`<span>📞 ${esc(u.phone)}</span>`:''}
-              ${u.website?`<span>🔗 <a href="${esc(u.website)}" target="_blank" style="color:var(--accent);text-decoration:none;word-break:break-all">${esc(u.website)}</a></span>`:''}
+              ${u.website?`<span>🔗 <a href="${esc(u.website)}" target="_blank" style="color:var(--accent);text-decoration:none">${esc(u.website)}</a></span>`:''}
               <span>📅 Joined ${fmtDate(u.createdAt)}</span>
             </div>
             ${(u.skills||[]).length ? `<div style="margin-top:.75rem">${u.skills.map(sk=>`<span class="skill-pill">${esc(sk)}</span>`).join('')}</div>` : ''}
           </div>
-          ${isMe?`<button class="btn btn-primary btn-sm" onclick="openOv('ov-edit-profile')" style="flex-shrink:0">✏️ Edit</button>`:''}
+          ${isMe?`<button class="btn btn-primary btn-sm" onclick="openOv('ov-edit-profile')">✏️ Edit Profile</button>`:''}
         </div>
       </div>
 
@@ -2482,7 +2134,7 @@ async function renderProfile(userId) {
         <div class="stat-card"><div class="stat-value">${s.publicProjects}</div><div class="stat-label">Public</div><span class="stat-icon">🌍</span></div>
         <div class="stat-card"><div class="stat-value">${s.privateProjects}</div><div class="stat-label">Private</div><span class="stat-icon">🔒</span></div>
         <div class="stat-card"><div class="stat-value">${s.totalVersions}</div><div class="stat-label">Versions</div><span class="stat-icon">🔄</span></div>
-        <div class="stat-card"><div class="stat-value">${s.totalStars}</div><div class="stat-label">Stars</div><span class="stat-icon">★</span></div>
+        <div class="stat-card"><div class="stat-value">${s.totalStars}</div><div class="stat-label">Stars Earned</div><span class="stat-icon">★</span></div>
       </div>
 
       <div class="page-hdr" style="margin-bottom:.5rem"><div><h2 style="font-size:18px">Public Projects</h2></div></div>
