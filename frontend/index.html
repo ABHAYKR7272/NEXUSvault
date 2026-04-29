@@ -446,7 +446,7 @@ html,body{
   cursor:pointer;transition:all .15s;position:relative;background:var(--bg3);
 }
 .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:#5b8cff08}
-.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;-webkit-appearance:none;font-size:16px}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .uz-icon{font-size:36px;display:block;margin-bottom:.5rem}
 .uz-title{font-family:var(--display);font-weight:700;font-size:14px}
 .uz-sub{font-size:11px;color:var(--text3);margin-top:4px}
@@ -1015,9 +1015,9 @@ html,body{
   <div style="margin-top:1rem">
    <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
     <span class="uz-icon">📦</span>
-    <div class="uz-title">Tap to select file</div>
-    <div class="uz-sub">Any file — photo, document, zip, PDF, video…</div>
-    <input type="file" id="up-file" onchange="handleFileSelect(this)" accept="*/*" style="font-size:16px">
+    <div class="uz-title">Tap or drop file here</div>
+    <div class="uz-sub">Any file type — single file, zip, image, PDF, code…</div>
+    <input type="file" id="up-file" onchange="handleFileSelect(this)" accept="*/*">
    </div>
    <div class="upload-preview" id="upload-preview">
     <span class="up-icon" id="up-file-icon">📄</span>
@@ -1101,7 +1101,7 @@ html,body{
    <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0;min-height:36px" onchange="loadVersion(this.value)"></select>
    <button class="btn btn-ghost btn-sm" id="btn-diff" onclick="openDiff()">↔ Compare</button>
    <button class="btn btn-ghost btn-sm" id="btn-new-ver" onclick="openNewVersion()">🔄 New Version</button>
-   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" onclick="handleDownload(event)">⬇ Download</a>
+   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" target="_blank">⬇ Download</a>
    <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Del Version</button>
   </div>
 
@@ -1144,7 +1144,7 @@ html,body{
    <span class="uz-icon">📁</span>
    <div class="uz-title">Tap or drop new file here</div>
    <div class="uz-sub">Any file type — updated source, new build, revised doc</div>
-   <input type="file" id="nv-file" onchange="handleNVFile(this)" accept="*/*" style="font-size:16px">
+   <input type="file" id="nv-file" onchange="handleNVFile(this)">
   </div>
   <div class="upload-preview" id="nv-preview">
    <span class="up-icon" id="nv-file-icon">📄</span>
@@ -1729,44 +1729,14 @@ function populateDetail() {
   updateMembersBox();
 }
 
-async function handleDownload(e) {
-  e.preventDefault();
-  const btn = document.getElementById('det-dl-btn');
-  const url = btn.dataset.href;
-  const filename = btn.dataset.filename || 'download';
-  if (!url || url === '#') return;
-  btn.textContent = '⏳ Downloading...';
-  btn.style.pointerEvents = 'none';
-  try {
-    const res = await fetch(url, {
-      headers: TOKEN ? { 'Authorization': 'Bearer ' + TOKEN } : {}
-    });
-    if (!res.ok) throw new Error('Server error: ' + res.status);
-    const blob = await res.blob();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
-    toast('Download started!', 'success');
-  } catch(err) {
-    toast('Download failed: ' + err.message, 'error');
-  } finally {
-    btn.textContent = '⬇ Download';
-    btn.style.pointerEvents = '';
-  }
-}
-
 function loadVersion(vNum) {
   CUR_VER = CUR_DOC.versions.find(v => v.versionNumber === vNum);
   if (!CUR_VER) return;
 
   const dlUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/download`;
   const prvUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/preview`;
-  const _dlBtn = document.getElementById('det-dl-btn');
-  _dlBtn.dataset.href = dlUrl;
-  _dlBtn.dataset.filename = CUR_VER.fileName || 'download';
+  document.getElementById('det-dl-btn').href = dlUrl;
+  document.getElementById('det-dl-btn').download = CUR_VER.fileName || 'download';
 
   document.getElementById('det-ver-info').innerHTML = `
     <span style="color:var(--accent);font-weight:600;font-family:var(--display)">v${CUR_VER.versionNumber}</span> ·
