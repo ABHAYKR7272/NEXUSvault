@@ -1101,7 +1101,7 @@ html,body{
    <select id="det-ver-select" class="field" style="width:auto;display:inline-block;padding:.45rem .75rem;font-size:12px;margin:0;min-height:36px" onchange="loadVersion(this.value)"></select>
    <button class="btn btn-ghost btn-sm" id="btn-diff" onclick="openDiff()">↔ Compare</button>
    <button class="btn btn-ghost btn-sm" id="btn-new-ver" onclick="openNewVersion()">🔄 New Version</button>
-   <a class="btn btn-ghost btn-sm" id="det-dl-btn" href="#" target="_blank">⬇ Download</a>
+   <button class="btn btn-ghost btn-sm" id="det-dl-btn" onclick="downloadWithAuth(this.dataset.url, this.dataset.filename)">⬇ Download</button>
    <button class="btn btn-red btn-sm" id="btn-del-ver" onclick="deleteCurrentVersion()" style="display:none">🗑 Del Version</button>
   </div>
 
@@ -1339,6 +1339,21 @@ async function http(method, path, body, isForm) {
   const data = await res.json();
   if (!data.success) { const err = new Error(data.message || 'Request failed'); err.data = data; throw err; }
   return data;
+}
+
+// ─── Authenticated file download (fixes "Needs authorization" error) ───────
+async function downloadWithAuth(url, fileName) {
+  try {
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+    if (!res.ok) { alert('Download failed — ' + res.statusText); return; }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName || 'download';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  } catch(e) { alert('Download error: ' + e.message); }
 }
 
 // ═══════════════════ TOAST ═══════════════════
@@ -1735,8 +1750,8 @@ function loadVersion(vNum) {
 
   const dlUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/download`;
   const prvUrl = `${API}/documents/${CUR_DOC._id}/versions/${vNum}/preview`;
-  document.getElementById('det-dl-btn').href = dlUrl;
-  document.getElementById('det-dl-btn').download = CUR_VER.fileName || 'download';
+  document.getElementById('det-dl-btn').dataset.url = dlUrl;
+  document.getElementById('det-dl-btn').dataset.filename = CUR_VER.fileName || 'download';
 
   document.getElementById('det-ver-info').innerHTML = `
     <span style="color:var(--accent);font-weight:600;font-family:var(--display)">v${CUR_VER.versionNumber}</span> ·
@@ -1785,7 +1800,7 @@ function renderVersionContent(v, prvUrl, dlUrl) {
       <div class="es-icon">${ext.includes('xl')?'📊':ext.includes('ppt')?'📊':'📝'}</div>
       <h3>${esc(v.fileName)}</h3>
       <p>This file type cannot be previewed in the browser.</p>
-      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download to Open</a>
+      <button onclick="downloadWithAuth('${dlUrl}','${v.fileName||'download'}')" class="btn btn-primary btn-sm" style="margin-top:1rem">⬇ Download to Open</button>
     </div>`;
   } else if (v.content) {
     container.innerHTML = `<pre style="background:var(--bg0);border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:var(--mono);font-size:12px;max-height:340px;overflow:auto;color:var(--text2);white-space:pre-wrap;word-break:break-all">${esc(v.content)}</pre>`;
@@ -1794,7 +1809,7 @@ function renderVersionContent(v, prvUrl, dlUrl) {
       <div class="es-icon">📄</div>
       <h3>${esc(v.fileName || 'File')}</h3>
       <p>${fmtSize(v.fileSize)} — No preview available</p>
-      <a href="${dlUrl}" class="btn btn-primary btn-sm" style="margin-top:1rem;text-decoration:none" download>⬇ Download</a>
+      <button onclick="downloadWithAuth('${dlUrl}','${v.fileName||'download'}')" class="btn btn-primary btn-sm" style="margin-top:1rem">⬇ Download</button>
     </div>`;
   }
 }
