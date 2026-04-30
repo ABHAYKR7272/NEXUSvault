@@ -773,17 +773,28 @@ router.get('/:id/versions/:ver/download', async (req, res) => {
     if (version.filePath) {
       const fp = version.filePath;
       if (/^https?:\/\//i.test(fp)) {
-        // Stream file through our server so browser gets Content-Disposition header
-        // (avoids Cloudinary transformation 401 caused by fl_attachment on free plan)
+        // Stream file through our server with redirect-following
+        // (Node's https.get does NOT auto-follow redirects — Cloudinary redirects to CDN
+        //  causing truncated zip downloads where only folder structure appears)
         const fileName = version.fileName || 'download';
-        const https = require('https');
-        const http  = require('http');
-        const lib   = fp.startsWith('https') ? https : http;
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         if (version.mimeType) res.setHeader('Content-Type', version.mimeType);
-        lib.get(fp, (stream) => stream.pipe(res)).on('error', (e) => {
-          res.status(500).json({ success: false, message: e.message });
-        });
+
+        function streamWithRedirects(url, hops) {
+          if (hops > 5) { return res.status(500).json({ success: false, message: 'Too many redirects' }); }
+          const lib = url.startsWith('https') ? require('https') : require('http');
+          lib.get(url, (upstream) => {
+            if (upstream.statusCode >= 300 && upstream.statusCode < 400 && upstream.headers.location) {
+              upstream.resume(); // drain & discard redirect body
+              return streamWithRedirects(upstream.headers.location, hops + 1);
+            }
+            if (upstream.headers['content-length']) {
+              res.setHeader('Content-Length', upstream.headers['content-length']);
+            }
+            upstream.pipe(res);
+          }).on('error', (e) => res.status(500).json({ success: false, message: e.message }));
+        }
+        streamWithRedirects(fp, 0);
         return;
       }
       if (fs.existsSync(fp)) {
