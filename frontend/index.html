@@ -1341,19 +1341,17 @@ async function http(method, path, body, isForm) {
   return data;
 }
 
-// ─── Authenticated file download ────────────────────────────────────────────
-// Flow: backend checks auth → 302 redirect → Cloudinary CDN (fl_attachment)
-// Browser downloads the file directly from Cloudinary, bypassing Vercel's
-// 4.5 MB serverless streaming limit that was corrupting large ZIPs.
-//
-// Why window.open?
-//  • anchor click (with a.download) → cross-origin, so 'download' attr ignored
-//  • hidden iframe                  → browsers BLOCK downloads from iframes
-//  • window.open(_blank)            → new tab follows 302 → Cloudinary sends
-//    Content-Disposition:attachment → browser saves file, tab auto-closes
+// ─── Authenticated file download (fixes "Needs authorization" error) ───────
 function downloadWithAuth(url, fileName) {
+  // Token ko query param mein daalte hain taaki browser direct navigate kare
+  // (fetch() use karne pe Cloudinary redirect CORS block karta tha)
   const dlUrl = url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
-  window.open(dlUrl, '_blank');
+  const a = document.createElement('a');
+  a.href = dlUrl;
+  a.download = fileName || 'download';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => a.remove(), 500);
 }
 
 // ═══════════════════ TOAST ═══════════════════
