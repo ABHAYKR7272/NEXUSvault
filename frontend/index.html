@@ -1342,21 +1342,18 @@ async function http(method, path, body, isForm) {
 }
 
 // ─── Authenticated file download ────────────────────────────────────────────
-// Flow: backend checks auth → 302 redirect to Cloudinary (fl_attachment) →
-// browser downloads directly from Cloudinary CDN.
-// We use window.location for navigation so the browser correctly follows the
-// cross-origin redirect and triggers the download from Cloudinary's CDN.
-// (fetch+blob was removed — it re-introduced Vercel's 4.5 MB streaming limit.)
+// Flow: backend checks auth → 302 redirect → Cloudinary CDN (fl_attachment)
+// Browser downloads the file directly from Cloudinary, bypassing Vercel's
+// 4.5 MB serverless streaming limit that was corrupting large ZIPs.
+//
+// Why window.open?
+//  • anchor click (with a.download) → cross-origin, so 'download' attr ignored
+//  • hidden iframe                  → browsers BLOCK downloads from iframes
+//  • window.open(_blank)            → new tab follows 302 → Cloudinary sends
+//    Content-Disposition:attachment → browser saves file, tab auto-closes
 function downloadWithAuth(url, fileName) {
   const dlUrl = url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
-  // Open in a hidden iframe so the current page does not navigate away.
-  // The backend sends 302 → Cloudinary with Content-Disposition: attachment,
-  // which the browser treats as a file download, not a page navigation.
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = dlUrl;
-  document.body.appendChild(iframe);
-  setTimeout(() => iframe.remove(), 10000); // cleanup after 10 s
+  window.open(dlUrl, '_blank');
 }
 
 // ═══════════════════ TOAST ═══════════════════
