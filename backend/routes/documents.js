@@ -773,7 +773,18 @@ router.get('/:id/versions/:ver/download', async (req, res) => {
     if (version.filePath) {
       const fp = version.filePath;
       if (/^https?:\/\//i.test(fp)) {
-        return res.redirect(getCloudinaryDeliveryUrl(fp, version.fileName || 'download', true));
+        // Stream file through our server so browser gets Content-Disposition header
+        // (avoids Cloudinary transformation 401 caused by fl_attachment on free plan)
+        const fileName = version.fileName || 'download';
+        const https = require('https');
+        const http  = require('http');
+        const lib   = fp.startsWith('https') ? https : http;
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        if (version.mimeType) res.setHeader('Content-Type', version.mimeType);
+        lib.get(fp, (stream) => stream.pipe(res)).on('error', (e) => {
+          res.status(500).json({ success: false, message: e.message });
+        });
+        return;
       }
       if (fs.existsSync(fp)) {
         res.setHeader('Content-Disposition', `attachment; filename="${version.fileName || 'download'}"`);
