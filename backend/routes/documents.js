@@ -150,26 +150,27 @@ function canEdit(doc, user) {
 }
 
 
-// Insert fl_attachment flag directly into the stored Cloudinary URL string.
-// Avoids cloudinary.url() SDK which was generating malformed URLs like
-// fl_attachment:filename.zip that Cloudinary CDN rejects with an error.
-//
-// Before: https://res.cloudinary.com/.../raw/upload/v1/nexusvault/file.zip
-// After:  https://res.cloudinary.com/.../raw/upload/fl_attachment/v1/nexusvault/file.zip
-function getCloudinaryDeliveryUrl(fileUrl, _fileName, asAttachment = false) {
-  if (!asAttachment) return fileUrl;
+function getCloudinaryPublicId(fileUrl) {
   try {
+    const u = new URL(fileUrl);
     const marker = '/raw/upload/';
-    const idx = fileUrl.indexOf(marker);
-    if (idx === -1) return fileUrl;
-    return (
-      fileUrl.slice(0, idx + marker.length) +
-      'fl_attachment/' +
-      fileUrl.slice(idx + marker.length)
-    );
+    const idx = u.pathname.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(u.pathname.slice(idx + marker.length).replace(/^v\d+\//, ''));
   } catch {
-    return fileUrl;
+    return null;
   }
+}
+
+function getCloudinaryDeliveryUrl(fileUrl, fileName, asAttachment = false) {
+  const publicId = getCloudinaryPublicId(fileUrl);
+  if (!publicId) return fileUrl;
+  return cloudinary.url(publicId, {
+    resource_type: 'raw',
+    type: 'upload',
+    secure: true,
+    flags: asAttachment ? `attachment:${fileName || 'download'}` : undefined,
+  });
 }
 
 // ── GET /api/documents/stats/overview ────────────────────────────────────
@@ -772,20 +773,29 @@ router.get('/:id/versions/:ver/download', async (req, res) => {
     if (version.filePath) {
       const fp = version.filePath;
       if (/^https?:\/\//i.test(fp)) {
-        // ── FIX: Redirect directly to Cloudinary (fl_attachment) ─────────────
-        // Root cause: Vercel Serverless Functions truncate response bodies larger
-        // than ~4.5 MB. When we streamed the ZIP through the backend, large ZIPs
-        // were cut off mid-stream. Because a ZIP's Central Directory lives at the
-        // very END of the file, truncation makes the ZIP appear empty — it opens
-        // but shows no files or folders inside.
-        //
-        // Fix: after auth passes, send a 302 redirect to Cloudinary with the
-        // fl_attachment flag (forces Content-Disposition: attachment on their CDN).
-        // The file goes Cloudinary → browser directly, bypassing Vercel's limit.
-        // Security is unchanged: only authenticated users ever reach this redirect.
+        // Stream file through our server with redirect-following
+        // (Node's https.get does NOT auto-follow redirects — Cloudinary redirects to CDN
+        //  causing truncated zip downloads where only folder structure appears)
         const fileName = version.fileName || 'download';
-        const dlUrl = getCloudinaryDeliveryUrl(fp, fileName, true);
-        return res.redirect(302, dlUrl);
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        if (version.mimeType) res.setHeader('Content-Type', version.mimeType);
+
+        function streamWithRedirects(url, hops) {
+          if (hops > 5) { return res.status(500).json({ success: false, message: 'Too many redirects' }); }
+          const lib = url.startsWith('https') ? require('https') : require('http');
+          lib.get(url, (upstream) => {
+            if (upstream.statusCode >= 300 && upstream.statusCode < 400 && upstream.headers.location) {
+              upstream.resume(); // drain & discard redirect body
+              return streamWithRedirects(upstream.headers.location, hops + 1);
+            }
+            if (upstream.headers['content-length']) {
+              res.setHeader('Content-Length', upstream.headers['content-length']);
+            }
+            upstream.pipe(res);
+          }).on('error', (e) => res.status(500).json({ success: false, message: e.message }));
+        }
+        streamWithRedirects(fp, 0);
+        return;
       }
       if (fs.existsSync(fp)) {
         res.setHeader('Content-Disposition', `attachment; filename="${version.fileName || 'download'}"`);
