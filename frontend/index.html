@@ -1341,17 +1341,22 @@ async function http(method, path, body, isForm) {
   return data;
 }
 
-// ─── Authenticated file download (fixes "Needs authorization" error) ───────
+// ─── Authenticated file download ────────────────────────────────────────────
+// Flow: backend checks auth → 302 redirect to Cloudinary (fl_attachment) →
+// browser downloads directly from Cloudinary CDN.
+// We use window.location for navigation so the browser correctly follows the
+// cross-origin redirect and triggers the download from Cloudinary's CDN.
+// (fetch+blob was removed — it re-introduced Vercel's 4.5 MB streaming limit.)
 function downloadWithAuth(url, fileName) {
-  // Token ko query param mein daalte hain taaki browser direct navigate kare
-  // (fetch() use karne pe Cloudinary redirect CORS block karta tha)
   const dlUrl = url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
-  const a = document.createElement('a');
-  a.href = dlUrl;
-  a.download = fileName || 'download';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => a.remove(), 500);
+  // Open in a hidden iframe so the current page does not navigate away.
+  // The backend sends 302 → Cloudinary with Content-Disposition: attachment,
+  // which the browser treats as a file download, not a page navigation.
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = dlUrl;
+  document.body.appendChild(iframe);
+  setTimeout(() => iframe.remove(), 10000); // cleanup after 10 s
 }
 
 // ═══════════════════ TOAST ═══════════════════
