@@ -150,27 +150,26 @@ function canEdit(doc, user) {
 }
 
 
-function getCloudinaryPublicId(fileUrl) {
+// Insert fl_attachment flag directly into the stored Cloudinary URL string.
+// Avoids cloudinary.url() SDK which was generating malformed URLs like
+// fl_attachment:filename.zip that Cloudinary CDN rejects with an error.
+//
+// Before: https://res.cloudinary.com/.../raw/upload/v1/nexusvault/file.zip
+// After:  https://res.cloudinary.com/.../raw/upload/fl_attachment/v1/nexusvault/file.zip
+function getCloudinaryDeliveryUrl(fileUrl, _fileName, asAttachment = false) {
+  if (!asAttachment) return fileUrl;
   try {
-    const u = new URL(fileUrl);
     const marker = '/raw/upload/';
-    const idx = u.pathname.indexOf(marker);
-    if (idx === -1) return null;
-    return decodeURIComponent(u.pathname.slice(idx + marker.length).replace(/^v\d+\//, ''));
+    const idx = fileUrl.indexOf(marker);
+    if (idx === -1) return fileUrl;
+    return (
+      fileUrl.slice(0, idx + marker.length) +
+      'fl_attachment/' +
+      fileUrl.slice(idx + marker.length)
+    );
   } catch {
-    return null;
+    return fileUrl;
   }
-}
-
-function getCloudinaryDeliveryUrl(fileUrl, fileName, asAttachment = false) {
-  const publicId = getCloudinaryPublicId(fileUrl);
-  if (!publicId) return fileUrl;
-  return cloudinary.url(publicId, {
-    resource_type: 'raw',
-    type: 'upload',
-    secure: true,
-    flags: asAttachment ? `attachment:${fileName || 'download'}` : undefined,
-  });
 }
 
 // ── GET /api/documents/stats/overview ────────────────────────────────────
