@@ -169,7 +169,6 @@ function getCloudinaryDeliveryUrl(fileUrl, fileName, asAttachment = false) {
     resource_type: 'raw',
     type: 'upload',
     secure: true,
-    sign_url: true,
     flags: asAttachment ? `attachment:${fileName || 'download'}` : undefined,
   });
 }
