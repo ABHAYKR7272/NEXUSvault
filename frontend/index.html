@@ -1341,17 +1341,25 @@ async function http(method, path, body, isForm) {
   return data;
 }
 
-// ─── Authenticated file download (fixes "Needs authorization" error) ───────
-function downloadWithAuth(url, fileName) {
-  // Token ko query param mein daalte hain taaki browser direct navigate kare
-  // (fetch() use karne pe Cloudinary redirect CORS block karta tha)
-  const dlUrl = url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
-  const a = document.createElement('a');
-  a.href = dlUrl;
-  a.download = fileName || 'download';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => a.remove(), 500);
+// ─── Authenticated file download ────────────────────────────────────────────
+// fetch → blob → instant download. No new tab, no redirect, no page navigation.
+async function downloadWithAuth(url, fileName) {
+  try {
+    const dlUrl = url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN);
+    toast('Downloading...', 'info');
+    const res = await fetch(dlUrl);
+    if (!res.ok) { toast('Download failed: ' + res.statusText, 'error'); return; }
+    const blob = await res.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objUrl;
+    a.download = fileName || 'download';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(objUrl); a.remove(); }, 1000);
+  } catch(e) {
+    toast('Download error: ' + e.message, 'error');
+  }
 }
 
 // ═══════════════════ TOAST ═══════════════════
