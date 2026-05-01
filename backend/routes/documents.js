@@ -150,27 +150,26 @@ function canEdit(doc, user) {
 }
 
 
-function getCloudinaryPublicId(fileUrl) {
+// Insert fl_attachment flag directly into the stored Cloudinary URL string.
+// Avoids cloudinary.url() SDK which was generating malformed URLs like
+// fl_attachment:filename.zip that Cloudinary CDN rejects with an error.
+//
+// Before: https://res.cloudinary.com/.../raw/upload/v1/nexusvault/file.zip
+// After:  https://res.cloudinary.com/.../raw/upload/fl_attachment/v1/nexusvault/file.zip
+function getCloudinaryDeliveryUrl(fileUrl, _fileName, asAttachment = false) {
+  if (!asAttachment) return fileUrl;
   try {
-    const u = new URL(fileUrl);
     const marker = '/raw/upload/';
-    const idx = u.pathname.indexOf(marker);
-    if (idx === -1) return null;
-    return decodeURIComponent(u.pathname.slice(idx + marker.length).replace(/^v\d+\//, ''));
+    const idx = fileUrl.indexOf(marker);
+    if (idx === -1) return fileUrl;
+    return (
+      fileUrl.slice(0, idx + marker.length) +
+      'fl_attachment/' +
+      fileUrl.slice(idx + marker.length)
+    );
   } catch {
-    return null;
+    return fileUrl;
   }
-}
-
-function getCloudinaryDeliveryUrl(fileUrl, fileName, asAttachment = false) {
-  const publicId = getCloudinaryPublicId(fileUrl);
-  if (!publicId) return fileUrl;
-  return cloudinary.url(publicId, {
-    resource_type: 'raw',
-    type: 'upload',
-    secure: true,
-    flags: asAttachment ? `attachment:${fileName || 'download'}` : undefined,
-  });
 }
 
 // ── GET /api/documents/stats/overview ────────────────────────────────────
@@ -770,39 +769,40 @@ router.get('/:id/versions/:ver/download', async (req, res) => {
     const version = doc.versions.find(v => v.versionNumber === req.params.ver);
     if (!version) return res.status(404).json({ success: false, message: 'Version not found' });
 
+    const fileName = version.fileName || 'download';
+
     if (version.filePath) {
       const fp = version.filePath;
       if (/^https?:\/\//i.test(fp)) {
-        // Stream file through our server with redirect-following
-        // (Node's https.get does NOT auto-follow redirects — Cloudinary redirects to CDN
-        //  causing truncated zip downloads where only folder structure appears)
-        const fileName = version.fileName || 'download';
+        // Fetch file from Cloudinary and pipe directly to browser.
+        // No redirect — browser gets bytes straight from our server.
+        // Follows redirects manually (Cloudinary CDN may redirect).
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-        if (version.mimeType) res.setHeader('Content-Type', version.mimeType);
+        res.setHeader('Content-Type', version.mimeType || 'application/octet-stream');
 
-        function streamWithRedirects(url, hops) {
-          if (hops > 5) { return res.status(500).json({ success: false, message: 'Too many redirects' }); }
+        const fetchAndPipe = (url, hops) => {
+          if (hops > 5) return res.status(500).end('Too many redirects');
           const lib = url.startsWith('https') ? require('https') : require('http');
           lib.get(url, (upstream) => {
             if (upstream.statusCode >= 300 && upstream.statusCode < 400 && upstream.headers.location) {
-              upstream.resume(); // drain & discard redirect body
-              return streamWithRedirects(upstream.headers.location, hops + 1);
+              upstream.resume();
+              return fetchAndPipe(upstream.headers.location, hops + 1);
             }
             if (upstream.headers['content-length']) {
               res.setHeader('Content-Length', upstream.headers['content-length']);
             }
             upstream.pipe(res);
+            upstream.on('error', () => res.end());
           }).on('error', (e) => res.status(500).json({ success: false, message: e.message }));
-        }
-        streamWithRedirects(fp, 0);
-        return;
+        };
+        return fetchAndPipe(fp, 0);
       }
       if (fs.existsSync(fp)) {
-        res.setHeader('Content-Disposition', `attachment; filename="${version.fileName || 'download'}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         return res.sendFile(fp);
       }
     }
-    res.setHeader('Content-Disposition', `attachment; filename="${version.fileName || 'file.txt'}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader('Content-Type', version.mimeType || 'text/plain');
     res.send(version.content || '');
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
